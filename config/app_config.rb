@@ -81,7 +81,8 @@ module AppConfig
       raise Invalid, 'Set a unique SECRET_KEY_BASE (64+ chars)' if c.system.secret_key_base.length < 64 || c.system.secret_key_base.start_with?('development-only')
       raise Invalid, 'Disable DEMO_ENABLED and SEED_DEMO in production' if c.demo.enabled || c.demo.seed
     end
-    raise Invalid, 'NAPCAT_ENABLED requires access and webhook tokens' if c.napcat.enabled && [c.napcat.access_token,c.napcat.webhook_token].any?(&:empty?)
+    raise Invalid, 'NAPCAT_ENABLED requires access and webhook tokens' if c.napcat.enabled && (c.napcat.webhook_token.empty? || (c.napcat.access_token.empty? && c.napcat.connection_tokens.empty?))
+    raise Invalid,'NAPCAT_CONNECTION_TOKENS must contain nonempty token strings' unless c.napcat.connection_tokens.values.all? { |value| value.is_a?(String) && !value.empty? }
     c
   end
   def self.current = Thread.current[:banshi_config] || (@current ||= load)

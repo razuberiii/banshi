@@ -1,0 +1,18 @@
+<% nodes.each_with_index do |node,index| %>
+  <div class="forward-node">
+    <span class="forward-avatar"><%= "#{local_assigns[:prefix]}#{index+1}" %></span>
+    <div class="forward-segments">
+      <small>匿名群友</small>
+      <% node.fetch('segments').each do |segment| %>
+        <% if segment['type']=='text' %><p><%= segment['text'] %></p>
+        <% elsif segment['type']=='image' %>
+          <% asset=Media::ForwardStructure.asset_for(content,segment) %>
+          <% if asset.visibility=='visible' %><%= image_tag media_path(asset),alt:'转发中的图片',loading:'lazy' %>
+          <% else %><%= empty_state('这张图片已下架。') %><% end %>
+        <% elsif segment['type']=='forward' %>
+          <div class="nested-forward"><small>引用的合并转发</small><%= render 'shared/forward_nodes',nodes:segment['nodes'],content:content,prefix:"#{local_assigns[:prefix]}#{index+1}." %></div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

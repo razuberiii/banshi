@@ -6,6 +6,27 @@ class SafetyEvaluator
     def allowed? = reasons.empty?
   end
 
+  def self.resume!(entry:, user:, reason:)
+    raise SecurityError, 'curator review required' unless user&.curator?
+    raise ArgumentError, 'a review reason is required' if reason.to_s.strip.empty?
+    entry.with_lock do
+      raise ArgumentError, '请先处理所有未决举报' if entry.reports.where(status:'open').exists?
+      result=call(entry:entry)
+      restrictions=result.reasons-['distribution_paused']
+      raise ArgumentError, "尚不能恢复传播：#{restrictions.join(', ')}" if restrictions.any?
+      entry.update!(distribution_paused:false)
+      audit=AuditLog.create!(shit_entry:entry,user:user,category:'safety',action:'resume_distribution',details:{reason:reason})
+      TimelineEvent.create!(shit_entry:entry,event_type:'distribution_resumed',label:'人工复核后恢复传播',
+        occurred_at:Time.current,details:{audit_id:audit.id},dedupe_key:"resume:#{audit.id}")
+    end
+    if %w[NORMAL HOT CLASSIC].include?(entry.level)
+      DistributionJob.perform_later(entry.id)
+    elsif entry.candidates.where(status:'accepted').exists?
+      TrialDispatchJob.perform_later(entry.id)
+    end
+    entry
+  end
+
   def self.call(entry:, group: nil)
     reasons = []
     reasons << 'merged_entry' if entry.merged_into_id
@@ -14,7 +35,7 @@ class SafetyEvaluator
     reasons << 'distribution_paused' if entry.distribution_paused?
     hard_tags = HARD_BLOCK_TAGS | AppConfig.safety.hard_block_tags
     reasons << 'platform_hard_block_tag' if (entry.safety_tags & hard_tags).any?
-    if group && entry.safety_level == 'YELLOW'
+    if group && (entry.safety_level == 'YELLOW' || entry.safety_tags.any?)
       reasons << 'group_does_not_accept_all_tags' if (entry.safety_tags - group.accepted_tags).any?
     end
     asset_ids = entry.content.assets.pluck(:id) | entry.content.forward_nodes.where.not(asset_id: nil).pluck(:asset_id)
@@ -36,7 +57,7 @@ class SafetyEvaluator
     now = Time.current
     decision = entry.with_lock do
       hard = (tags & (HARD_BLOCK_TAGS | AppConfig.safety.hard_block_tags)).any?
-      actual_level = hard ? 'RED' : level
+      actual_level = hard ? 'RED' : level=='GREEN' && tags.any? ? 'YELLOW' : level
       actual_visibility = actual_level == 'RED' ? 'hidden' : visibility
       entry.update!(safety_level: actual_level, safety_tags: tags, visibility: actual_visibility)
       record = SafetyDecision.create!(shit_entry: entry, user: user, level: actual_level,

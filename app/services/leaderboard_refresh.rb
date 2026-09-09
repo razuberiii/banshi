@@ -4,8 +4,9 @@ class LeaderboardRefresh
     cutoff = now - AppConfig.leaderboard.period
     limit = AppConfig.leaderboard.limit
     entries = ShitEntry.publicly_visible
+    period = ArchivePeriodMetrics.call(now:now)
     boards = {
-      'fastest' => entries.where(first_seen_at: cutoff..now).order(distribution_score: :desc, id: :asc).limit(limit).map { |entry| row(entry, entry.distribution_score) },
+      'fastest' => period[:reach].sort_by { |id,count| [-count,id] }.first(limit).map { |id,count| {id:id,value:count} },
       'natural' => entries.order(natural_count: :desc, id: :asc).limit(limit).map { |entry| row(entry, entry.natural_count) },
       'cross_group' => entries.order(natural_group_count: :desc, id: :asc).limit(limit).map { |entry| row(entry, entry.natural_group_count) },
       'longevity' => entries.order(Arel.sql('(last_natural_at - first_seen_at) DESC'), :id).limit(limit).map { |entry| row(entry, entry.lifespan_days) },
@@ -17,7 +18,7 @@ class LeaderboardRefresh
     }
     # Only real completed trials participate in the explicit-negative board.
     bad_scores = TrialResult.joins(:trial_run).where(trial_runs: { shit_entry_id: entries.select(:id) }).group('trial_runs.shit_entry_id').maximum(:negative_rate)
-    boards['bad'] = bad_scores.sort_by { |id, value| [-value, id] }.first(limit).map { |id, value| { id: id, value: value } }
+    boards['bad'] = bad_scores.select { |_,value| value.positive? }.sort_by { |id, value| [-value, id] }.first(limit).map { |id, value| { id: id, value: value } }
     LeaderboardSnapshot.transaction do
       boards.map do |name, rows|
         snapshot = LeaderboardSnapshot.find_or_initialize_by(board: name)

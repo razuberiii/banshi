@@ -11,6 +11,17 @@ class EventBoundariesTest < ActiveSupport::TestCase
     {'post_type'=>'notice','self_id'=>connection.bot_account.external_id,'group_id'=>group.external_id,'time'=>Time.current.to_i}.merge(attributes.stringify_keys)
   end
 
+  test 'short message ID conflicts retain separate evidence without overwriting history' do
+    @group=domain_group;@connection=domain_bot(@group)
+    payload={'post_type'=>'message','message_type'=>'group','self_id'=>@connection.bot_account.external_id,'group_id'=>@group.external_id,'user_id'=>'person-a','message_id'=>'same-short-id','time'=>Time.current.to_i,'message'=>[{'type'=>'text','data'=>{'text'=>'first'}}]}
+    first=Events::Ingestor.call(payload:payload,connection:@connection,enqueue:false).first
+    conflict=Events::Ingestor.call(payload:payload.merge('user_id'=>'person-b','time'=>payload['time']+10),connection:@connection,enqueue:false).first
+    assert_equal 'person-a',first.reload.sender_external_id
+    assert_equal 'ignored',conflict.status
+    assert_equal 2,RawEvent.count
+    assert AuditLog.exists?(category:'onebot',action:'message_id_conflict')
+  end
+
   test 'failed processing rolls back business changes while retaining each attempt' do
     group=domain_group
     connection=domain_bot(group)

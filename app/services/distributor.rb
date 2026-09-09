@@ -106,6 +106,10 @@ class Distributor
       delivery.group.lock!
       delivery.lock!
       message = Message.find_or_initialize_by(group: delivery.group, external_id: external_id)
+      if message.persisted? && (message.bot_account_id != delivery.bot_connection.bot_account_id ||
+          message.shit_occurrence.present? || (message.content_id && message.content_id != entry.content_id))
+        raise ArgumentError, 'send receipt conflicts with an existing message; reconcile before attaching history'
+      end
       message.assign_attributes(content: entry.content, bot_account: delivery.bot_connection.bot_account,
         transporter: nil, source: delivery.kind, kind: entry.content.kind, sent_at: now)
       message.save!

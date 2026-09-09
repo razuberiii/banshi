@@ -503,6 +503,11 @@
       "NAPCAT_MAX_MEDIA_PIXELS",
       "integer",
       40000000
+    ],
+    "connection_tokens": [
+      "NAPCAT_CONNECTION_TOKENS",
+      "json",
+      {}
     ]
   },
   "storage": {

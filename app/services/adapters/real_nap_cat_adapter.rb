@@ -46,7 +46,7 @@ module Adapters
       base=@connection.endpoint.presence || AppConfig.napcat.http_url
       uri=URI.join(base.end_with?('/') ? base : "#{base}/",name)
       raise RemoteError,'NapCat endpoint must be HTTP(S)' unless %w[http https].include?(uri.scheme)
-      request=Net::HTTP::Post.new(uri);request['Authorization']="Bearer #{AppConfig.napcat.access_token}"
+      request=Net::HTTP::Post.new(uri);request['Authorization']="Bearer #{@connection.access_token}"
       request['Content-Type']='application/json';request.body=(params.merge(kwargs)).to_json
       timeout=AppConfig.napcat.request_timeout
       response=Net::HTTP.start(uri.host,uri.port,use_ssl:uri.scheme=='https',open_timeout:timeout,read_timeout:timeout,write_timeout:timeout) do |http|

@@ -27,4 +27,15 @@ class AppConfigTest < ActiveSupport::TestCase
     assert_equal({collect:true,distribute:true},BotModeParser.call('自助餐 · 值班中'))
     assert_equal({collect:false,distribute:false},BotModeParser.call('休息'))
   end
+
+  test 'multiple connections resolve separate credentials without database secrets' do
+    c=AppConfig.load({'NAPCAT_ENABLED'=>'true','NAPCAT_WEBHOOK_TOKEN'=>'ingress-test','NAPCAT_CONNECTION_TOKENS'=>'{"bot-a":"a-token","bot-b":"b-token"}'})
+    assert_equal 'a-token',c.napcat.connection_tokens['bot-a']
+    AppConfig.with(napcat:{connection_tokens:c.napcat.connection_tokens,access_token:'fallback-token'}) do
+      assert_equal 'a-token',BotConnection.new(credential_env_key:'bot-a').access_token
+      assert_equal 'b-token',BotConnection.new(credential_env_key:'bot-b').access_token
+      assert_equal 'fallback-token',BotConnection.new.access_token
+    end
+    assert_raises(AppConfig::Invalid) { AppConfig.load({'NAPCAT_CONNECTION_TOKENS'=>'{"bot-a":42}'}) }
+  end
 end

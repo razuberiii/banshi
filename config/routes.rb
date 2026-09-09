@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   get 'curation', to:'curation#index', as: :curation
   post 'curation/candidates/:id', to:'curation#moderate_candidate', as: :moderate_candidate
   post 'curation/:sid/review', to:'curation#review', as: :review_entry
+  post 'curation/:sid/resume', to:'curation#resume_distribution', as: :resume_distribution
   post 'curation/reports/:id', to:'curation#resolve_report', as: :resolve_report
   post 'curation/:sid/merge', to:'curation#merge', as: :merge_entry
   post 'curation/merges/:id/revert', to:'curation#revert', as: :revert_merge

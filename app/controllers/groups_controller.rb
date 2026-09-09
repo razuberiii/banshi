@@ -17,9 +17,11 @@ class GroupsController < ApplicationController
       @recent=@discoveries.order(first_seen_at: :desc).limit(6)
       @classic=@discoveries.where(level:'CLASSIC').order(natural_count: :desc).limit(3)
       @consumed=ShitEntry.publicly_visible.where(id:@group.shit_occurrences.bot.select(:shit_entry_id)).limit(4)
-      @repeated=ShitEntry.publicly_visible.where(id:@group.shit_occurrences.natural.select(:shit_entry_id)).order(natural_count: :desc).limit(4)
+      @repeat_counts=@group.shit_occurrences.natural.group(:shit_entry_id).count
+      repeated=ShitEntry.publicly_visible.where(id:@repeat_counts.keys).index_by(&:id)
+      @repeated=@repeat_counts.sort_by { |id,count| [-count,id] }.filter_map { |id,_| repeated[id] }.first(4)
       @exported=@discoveries.order(natural_group_count: :desc).limit(4)
-      @timeline=@group.timeline_events.where(shit_entry_id:ShitEntry.publicly_visible.select(:id)).order(occurred_at: :desc).includes(:shit_entry,:group).limit(20)
+      @timeline=@group.timeline_events.where(shit_entry_id:ShitEntry.publicly_visible.select(:id)).or(@group.timeline_events.where(shit_entry_id:nil)).order(occurred_at: :desc).includes(:shit_entry,:group).limit(20)
       @contributors=@group.transporters.public_profiles.order(natural_count: :desc).limit(6) unless @group.hide_members?
     end
   end

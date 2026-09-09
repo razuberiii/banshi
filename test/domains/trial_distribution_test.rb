@@ -266,4 +266,22 @@ class TrialDistributionDomainTest < ActiveSupport::TestCase
     Distributor.deliver!(delivery: delivery)
     assert_nil delivery.reload.message_id
   end
+
+  test 'a conflicting receipt never overwrites an unarchived natural message' do
+    group=domain_group(cooldown_minutes:0)
+    domain_bot(group)
+    original=domain_message(group:group)
+    entry=domain_entry(safety_level:'GREEN',visibility:'public',level:'NORMAL')
+    delivery=Distributor.call(entry:entry).first
+    receipt=original.external_id
+    adapter=Object.new
+    adapter.define_singleton_method(:send_content) { |**_|receipt }
+    assert_raises(ArgumentError) { Adapters::Registry.stub(:for,adapter) { Distributor.deliver!(delivery:delivery) } }
+    assert_equal 'uncertain',delivery.reload.status
+    assert_equal receipt,delivery.external_message_id
+    assert_equal 'NATURAL',original.reload.source
+    refute_nil original.transporter_id
+    refute_equal entry.content_id,original.content_id
+    assert_nil original.shit_occurrence
+  end
 end

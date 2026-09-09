@@ -39,14 +39,8 @@ class ReportService
       report.update!(status: status, reviewer: reviewer, resolution: resolution, reviewed_at: Time.current)
       AuditLog.create!(shit_entry: report.shit_entry, user: reviewer, category: 'report', action: status,
         details: { report_id: report.id, resolution: resolution })
-      entry = report.shit_entry
-      open_reports = entry.reports.where(status: 'open')
-      still_paused = open_reports.where(reason: AppConfig.safety.urgent_report_reasons).exists? ||
-        open_reports.distinct.count(:user_id) >= AppConfig.safety.report_pause_threshold
-      # Resolving a report never changes RED/hidden media. A separate explicit
-      # safety review is necessary to restore that visibility.
-      entry.update!(distribution_paused: still_paused)
-      TrialDispatchJob.perform_later(entry.id) if !still_paused && SafetyEvaluator.call(entry: entry).allowed? && entry.trial_runs.active.exists?
+      # Closing a report records a resolution only. Resuming distribution is
+      # a separate audited review, even when the remaining report count is low.
       report
     end
   end

@@ -28,6 +28,13 @@ class CurationController < ApplicationController
   rescue ArgumentError=>e
     redirect_to curation_path,alert:e.message
   end
+  def resume_distribution
+    entry=ShitEntry.find_by!(sid:params[:sid])
+    SafetyEvaluator.resume!(entry:entry,user:current_user,reason:params[:reason])
+    redirect_to curation_path(q:entry.sid),notice:'已记录人工复核并恢复传播，后续投放仍遵守群胃口与限额。'
+  rescue ArgumentError=>e
+    redirect_to curation_path(q:params[:sid]),alert:e.message
+  end
   def resolve_report
     report=Report.find(params[:id])
     ReportService.resolve!(report:report,reviewer:current_user,status:params[:status],resolution:params[:resolution])

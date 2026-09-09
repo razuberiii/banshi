@@ -3,6 +3,20 @@ require_relative '../domain_helpers'
 class StatisticsDomainTest < ActiveSupport::TestCase
   include DomainHelpers
 
+  test 'weekly reach counts distinct recent groups and excludes old and future activity' do
+    now=Time.current
+    entry=domain_entry(safety_level:'GREEN',visibility:'public')
+    first=entry.first_group
+    old=domain_group
+    future=domain_group
+    [[first,now-2.hours],[first,now-1.hour],[old,now-8.days],[future,now+1.day]].each do |group,at|
+      OccurrenceRecorder.call(entry:entry,message:domain_message(group:group,content:entry.content,at:at))
+    end
+    metrics=ArchivePeriodMetrics.call(now:now)
+    assert_equal 1,metrics[:reach][entry.id]
+    assert_equal 2,metrics[:natural][entry.id]
+  end
+
   test 'group statistics derive natural discoveries and bot visits separately' do
     group = domain_group
     entry = domain_entry(group: group)

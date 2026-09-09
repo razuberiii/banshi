@@ -1,8 +1,10 @@
 # 统一配置参考
 
-配置优先级：代码默认值 → ENV → 群数据库偏好。群偏好只覆盖群胃口、摄入量、冷却等项目；不能覆盖 RED 或平台硬标签。
+配置优先级：代码默认值 → ENV → 群数据库偏好。群偏好只覆盖胃口、摄入量、冷却等群设置，不能突破 RED 或平台硬标签。
 
-所有 ENV 由 `config/app_config.rb` 读取、转换、启动校验。`minutes / hours / days` 转换为秒；业务模块读取 `AppConfig.section.key`。更换来源时修改 `AppConfig.load(source)` 即可。
+`config/app_config.rb` 集中处理类型、默认值和启动校验。时间单位转换为秒，业务使用 `AppConfig.section.key`。更换来源时修改 `AppConfig.load(source)`。
+
+此文件和 `.env.example` 由 `ruby script/config_reference.rb` 生成，新增配置后请重新运行。
 
 ## system
 
@@ -11,7 +13,7 @@
 | `RAILS_ENV` | `system.environment` | string | development |
 | `PORT` | `system.port` | integer | 3000 |
 | `RAILS_MAX_THREADS` | `system.web_threads` | integer | 5 |
-| `SECRET_KEY_BASE` | `system.secret_key_base` | string | 开发专用占位密钥；正式环境必须设置 |
+| `SECRET_KEY_BASE` | `system.secret_key_base` | string | 开发专用占位密钥；生产必须替换 |
 | `ALLOWED_HOSTS` | `system.allowed_hosts` | list | [] |
 | `FORCE_SSL` | `system.force_ssl` | boolean | false |
 | `PAGE_SIZE` | `system.page_size` | integer | 18 |
@@ -155,6 +157,7 @@
 | `NAPCAT_MAX_FORWARD_NODES` | `napcat.max_forward_nodes` | integer | 200 |
 | `NAPCAT_MAX_FORWARD_MEDIA` | `napcat.max_forward_media` | integer | 50 |
 | `NAPCAT_MAX_MEDIA_PIXELS` | `napcat.max_media_pixels` | integer | 40000000 |
+| `NAPCAT_CONNECTION_TOKENS` | `napcat.connection_tokens` | json | {} |
 
 ## storage
 

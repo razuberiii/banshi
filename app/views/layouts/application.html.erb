@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+  <meta charset="utf-8">
   <title><%= content_for?(:title) ? "#{yield(:title)} · 搬💩" : '搬💩 · 互联网群聊文化档案馆' %></title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="群聊里顺手一发，馆里认真存一份。收藏、试吃、复读与考古，留下互联网抽象内容的生命史。">
@@ -12,7 +13,7 @@
 <a class="skip-link" href="#main">跳到馆藏内容</a>
 <header class="site-header">
   <div class="header-inner">
-    <a class="brand" href="<%= root_path %>" aria-label="搬屎，返回首页"><span class="brand-seal">搬</span><span class="brand-word">搬💩<small>互联网群聊文化档案馆</small></span></a>
+    <a class="brand" href="<%= root_path %>" aria-label="搬屎，返回首页"><span class="brand-seal">搬</span><span class="brand-word">搬<svg class="brand-icon" viewBox="0 0 30 30" aria-hidden="true"><path d="M14 2c6 1 8 5 5 8 5 0 7 5 3 8 8 2 7 10-1 10H7c-8 0-8-8-1-10-4-3-1-8 5-8 4-1 5-4 3-8Z" fill="currentColor"/><path d="M8 18h14M11 10h8" fill="none" stroke="white" stroke-width="1.5" opacity=".65"/></svg><small>互联网群聊文化档案馆</small></span></a>
     <nav aria-label="主导航" class="primary-nav">
       <%= link_to '逛馆藏',entries_path,class:controller_name=='entries' ? 'active' : nil %>
       <%= link_to '抢先试吃',trials_path,class:controller_name=='trials' ? 'active' : nil %>

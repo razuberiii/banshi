@@ -4,6 +4,33 @@ class SafetyDomainTest < ActiveSupport::TestCase
   include DomainHelpers
   include ActiveJob::TestHelper
 
+  test 'resuming a paused entry requires an explicit review with all reports closed and all restrictions satisfied' do
+    entry=domain_entry(level:'NORMAL',safety_level:'GREEN',visibility:'public',distribution_paused:true)
+    reviewer=domain_user(site_role:'curator')
+    report=ReportService.create!(entry:entry,user:domain_user,reason:'other',details:'review')
+    assert_raises(ArgumentError) { SafetyEvaluator.resume!(entry:entry,user:reviewer,reason:'checked') }
+    assert entry.reload.distribution_paused
+    ReportService.resolve!(report:report,reviewer:reviewer,status:'resolved',resolution:'checked')
+    assert entry.reload.distribution_paused
+    assert_raises(SecurityError) { SafetyEvaluator.resume!(entry:entry,user:domain_user,reason:'checked') }
+    entry.update!(safety_level:'RED')
+    assert_raises(ArgumentError) { SafetyEvaluator.resume!(entry:entry,user:reviewer,reason:'checked') }
+    assert entry.reload.distribution_paused
+    entry.update!(safety_level:'GREEN')
+    assert_enqueued_with(job:DistributionJob,args:[entry.id]) do
+      SafetyEvaluator.resume!(entry:entry,user:reviewer,reason:'所有举报已处理，复核原图与标签')
+    end
+    refute entry.reload.distribution_paused
+    assert_equal 1,AuditLog.where(shit_entry:entry,action:'resume_distribution').count
+  end
+
+  test 'tagged content cannot use GREEN to bypass a groups appetite' do
+    entry=domain_entry(safety_level:'GREEN',safety_tags:['NSFW'],visibility:'public')
+    refute SafetyEvaluator.call(entry:entry,group:domain_group(accepted_tags:[])).allowed?
+    decision=SafetyEvaluator.mark!(entry:entry,level:'GREEN',tags:['NSFW'],visibility:'public',reason:'explicit tag',user:domain_user(site_role:'curator'))
+    assert_equal 'YELLOW',decision.level
+  end
+
   test 'default red and a high quality score cannot bypass safety' do
     entry = domain_entry(level: 'HOT', distribution_score: 100)
     refute SafetyEvaluator.call(entry: entry).allowed?

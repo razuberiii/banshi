@@ -6,6 +6,9 @@ require 'active_record/railtie'
 require 'action_controller/railtie'
 require 'action_view/railtie'
 require 'rails/test_unit/railtie'
+# Load Nokogiri's bundled libxml before libvips. On Linux the reverse order
+# can bind HTML5 XPath to libvips' older system libxml symbols.
+require 'nokogiri'
 Bundler.require(*Rails.groups)
 require_relative 'app_config'
 module Banshi

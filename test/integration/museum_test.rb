@@ -34,6 +34,21 @@ class MuseumTest < ActionDispatch::IntegrationTest
     get entries_path,params:{group:@group.slug,level:'ARCHIVED'};assert_response :success;assert_includes response.body,@entry.sid
   end
 
+  test 'forward pages preserve nested text image order and escape user supplied content' do
+    content=domain_content(kind:'forward')
+    asset=Asset.create!(sha256:SecureRandom.hex(32),storage_key:SecureRandom.hex(12),content_type:'image/png',byte_size:10)
+    Attachment.create!(content:content,asset:asset,position:0)
+    content.update!(metadata:{'forward_tree'=>[{'segments'=>[{'type'=>'text','text'=>'<script>private data</script>'},
+      {'type'=>'forward','nodes'=>[{'segments'=>[{'type'=>'text','text'=>'里面的一层'},{'type'=>'image','attachment_position'=>0}]}]}]}]})
+    entry=domain_entry(content:content,safety_level:'GREEN',visibility:'public')
+    get entry_path(entry)
+    assert_response :success
+    assert_select '.forward-node .forward-node',count:1
+    assert_select '.forward-node img[src=?]',media_path(asset),count:1
+    assert_select 'script',text:'private data',count:0
+    assert_includes response.body,'&lt;script&gt;private data&lt;/script&gt;'
+  end
+
   test 'hidden entries and private associations never appear on public pages' do
     stats_group=domain_group(visibility:'statistics',public_name:'只可公开统计的秘密群馆')
     secret_group=domain_group(visibility:'hidden')
@@ -104,6 +119,21 @@ class MuseumTest < ActionDispatch::IntegrationTest
       post rate_entry_path(@entry),params:{reaction:'💩'};assert_response :not_found
       post demo_login_path;assert_response :not_found
     end
+  end
+
+  test 'curator can explicitly resume reviewed content through the museum curation page' do
+    @entry.update!(distribution_paused:true)
+    login
+    post resume_distribution_path(@entry),params:{reason:'不能越权'}
+    assert_response :forbidden
+    assert @entry.reload.distribution_paused
+    login(domain_user(site_role:'curator'))
+    get curation_path,params:{q:@entry.sid}
+    assert_response :success
+    assert_select 'form[action=?]',resume_distribution_path(@entry),count:1
+    post resume_distribution_path(@entry),params:{reason:'逐项复核完成'}
+    assert_redirected_to curation_path(q:@entry.sid)
+    refute @entry.reload.distribution_paused
   end
 
   test 'claims are scoped to web identity and displayed only once' do

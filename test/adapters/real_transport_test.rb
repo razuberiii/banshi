@@ -21,7 +21,7 @@ class RealTransportTest < Minitest::Test
   def send_entry
     endpoint=+'http://napcat.invalid/'
     endpoint.define_singleton_method(:presence) { self }
-    connection=OpenStruct.new(endpoint:endpoint,bot_account:OpenStruct.new(external_id:'bot'))
+    connection=OpenStruct.new(endpoint:endpoint,access_token:'test-access',bot_account:OpenStruct.new(external_id:'bot'))
     content=OpenStruct.new(assets:[],forward?:false)
     entry=OpenStruct.new(sid:'S-1',display_title:'Test',content:content)
     Adapters::RealNapCatAdapter.new(connection).send_content(group:OpenStruct.new(external_id:'group'),entry:entry,kind:'BOT_DISTRIBUTION',idempotency_key:'test-send')
