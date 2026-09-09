@@ -1,0 +1,12 @@
+/.env
+/.env.*
+!/.env.example
+/vendor/bundle
+/.bundle
+/log/*
+/tmp/*
+/storage/*
+/public/assets
+/coverage
+*.pid
+.DS_Store

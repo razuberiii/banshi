@@ -1,0 +1,621 @@
+{
+  "system": {
+    "environment": [
+      "RAILS_ENV",
+      "string",
+      "development"
+    ],
+    "port": [
+      "PORT",
+      "integer",
+      3000
+    ],
+    "web_threads": [
+      "RAILS_MAX_THREADS",
+      "integer",
+      5
+    ],
+    "secret_key_base": [
+      "SECRET_KEY_BASE",
+      "string",
+      "development-only-change-this-secret-before-deploying-development-only-change-this-secret-before-deploying-"
+    ],
+    "allowed_hosts": [
+      "ALLOWED_HOSTS",
+      "list",
+      []
+    ],
+    "force_ssl": [
+      "FORCE_SSL",
+      "boolean",
+      false
+    ],
+    "page_size": [
+      "PAGE_SIZE",
+      "integer",
+      18
+    ]
+  },
+  "database": {
+    "url": [
+      "DATABASE_URL",
+      "string",
+      "postgresql://localhost/banshi_development"
+    ],
+    "test_url": [
+      "TEST_DATABASE_URL",
+      "string",
+      "postgresql://localhost/banshi_test"
+    ],
+    "pool": [
+      "DATABASE_POOL",
+      "integer",
+      12
+    ]
+  },
+  "candidate": {
+    "ttl": [
+      "CANDIDATE_TTL_MINUTES",
+      "minutes",
+      30
+    ],
+    "reply_weight": [
+      "CANDIDATE_REPLY_WEIGHT",
+      "float",
+      2
+    ],
+    "quote_weight": [
+      "CANDIDATE_QUOTE_WEIGHT",
+      "float",
+      2.5
+    ],
+    "reaction_weight": [
+      "CANDIDATE_REACTION_WEIGHT",
+      "float",
+      1.5
+    ],
+    "repeat_weight": [
+      "CANDIDATE_REPEAT_WEIGHT",
+      "float",
+      5
+    ],
+    "forward_base": [
+      "CANDIDATE_FORWARD_BASE_SCORE",
+      "float",
+      1
+    ],
+    "image_base": [
+      "CANDIDATE_IMAGE_BASE_SCORE",
+      "float",
+      0
+    ],
+    "min_score": [
+      "CANDIDATE_MIN_SCORE",
+      "float",
+      5
+    ],
+    "min_unique_users": [
+      "CANDIDATE_MIN_UNIQUE_USERS",
+      "integer",
+      2
+    ],
+    "activity_weight": [
+      "CANDIDATE_ACTIVITY_WEIGHT",
+      "float",
+      0
+    ],
+    "max_late_age": [
+      "CANDIDATE_MAX_LATE_MINUTES",
+      "minutes",
+      1440
+    ]
+  },
+  "reputation": {
+    "enabled": [
+      "REPUTATION_ENABLED",
+      "boolean",
+      true
+    ],
+    "min_samples": [
+      "REPUTATION_MIN_SAMPLES",
+      "integer",
+      5
+    ],
+    "prior_successes": [
+      "REPUTATION_PRIOR_SUCCESSES",
+      "float",
+      3
+    ],
+    "prior_failures": [
+      "REPUTATION_PRIOR_FAILURES",
+      "float",
+      3
+    ],
+    "max_adjustment": [
+      "REPUTATION_MAX_ADJUSTMENT",
+      "float",
+      1
+    ],
+    "natural_weight": [
+      "REPUTATION_NATURAL_WEIGHT",
+      "float",
+      0.3
+    ],
+    "classic_weight": [
+      "REPUTATION_CLASSIC_WEIGHT",
+      "float",
+      1
+    ]
+  },
+  "duplicate": {
+    "phash_threshold": [
+      "DUPLICATE_PHASH_THRESHOLD",
+      "integer",
+      5
+    ],
+    "possible_threshold": [
+      "DUPLICATE_POSSIBLE_THRESHOLD",
+      "integer",
+      12
+    ],
+    "aspect_tolerance": [
+      "DUPLICATE_ASPECT_TOLERANCE",
+      "float",
+      0.12
+    ],
+    "scan_limit": [
+      "DUPLICATE_SCAN_LIMIT",
+      "integer",
+      2000
+    ]
+  },
+  "safety": {
+    "default_level": [
+      "SAFETY_DEFAULT_LEVEL",
+      "string",
+      "RED"
+    ],
+    "default_visibility": [
+      "SAFETY_DEFAULT_VISIBILITY",
+      "string",
+      "hidden"
+    ],
+    "tags": [
+      "SAFETY_TAGS",
+      "list",
+      [
+        "GORE",
+        "NSFW",
+        "GROTESQUE",
+        "HARASSMENT",
+        "PRIVACY",
+        "EXTREME",
+        "OTHER_SENSITIVE"
+      ]
+    ],
+    "hard_block_tags": [
+      "SAFETY_HARD_BLOCK_TAGS",
+      "list",
+      [
+        "PRIVACY",
+        "EXTREME"
+      ]
+    ],
+    "file_blacklist": [
+      "SAFETY_FILE_BLACKLIST",
+      "list",
+      []
+    ],
+    "source_blacklist": [
+      "SAFETY_SOURCE_BLACKLIST",
+      "list",
+      []
+    ],
+    "report_pause_threshold": [
+      "REPORT_AUTO_PAUSE_THRESHOLD",
+      "integer",
+      3
+    ],
+    "urgent_report_reasons": [
+      "REPORT_URGENT_REASONS",
+      "list",
+      [
+        "privacy",
+        "minors"
+      ]
+    ]
+  },
+  "trial": {
+    "enabled": [
+      "TRIAL_ENABLED",
+      "boolean",
+      true
+    ],
+    "group_min": [
+      "TRIAL_GROUP_MIN",
+      "integer",
+      3
+    ],
+    "group_max": [
+      "TRIAL_GROUP_MAX",
+      "integer",
+      5
+    ],
+    "duration": [
+      "TRIAL_DURATION_MINUTES",
+      "minutes",
+      60
+    ],
+    "reaction_good": [
+      "TRIAL_REACTION_GOOD",
+      "string",
+      "💩"
+    ],
+    "reaction_funny": [
+      "TRIAL_REACTION_FUNNY",
+      "string",
+      "😂"
+    ],
+    "reaction_bad": [
+      "TRIAL_REACTION_BAD",
+      "string",
+      "🥱"
+    ],
+    "min_responsive_groups": [
+      "TRIAL_MIN_RESPONSIVE_GROUPS",
+      "integer",
+      1
+    ],
+    "positive_threshold": [
+      "TRIAL_POSITIVE_THRESHOLD",
+      "float",
+      0.5
+    ],
+    "negative_max": [
+      "TRIAL_NEGATIVE_MAX",
+      "float",
+      0.4
+    ],
+    "reply_positive_min": [
+      "TRIAL_REPLY_POSITIVE_MIN",
+      "integer",
+      2
+    ],
+    "good_weight": [
+      "TRIAL_GOOD_WEIGHT",
+      "float",
+      2
+    ],
+    "funny_weight": [
+      "TRIAL_FUNNY_WEIGHT",
+      "float",
+      1
+    ],
+    "bad_weight": [
+      "TRIAL_BAD_WEIGHT",
+      "float",
+      2
+    ],
+    "max_wait": [
+      "TRIAL_MAX_WAIT_HOURS",
+      "hours",
+      24
+    ]
+  },
+  "distribution": {
+    "enabled": [
+      "DISTRIBUTION_ENABLED",
+      "boolean",
+      true
+    ],
+    "daily_limit": [
+      "DISTRIBUTION_GROUP_DAILY_LIMIT",
+      "integer",
+      6
+    ],
+    "cooldown": [
+      "DISTRIBUTION_GROUP_COOLDOWN_MINUTES",
+      "minutes",
+      60
+    ],
+    "global_per_minute": [
+      "DISTRIBUTION_GLOBAL_PER_MINUTE",
+      "integer",
+      20
+    ],
+    "batch_size": [
+      "DISTRIBUTION_BATCH_SIZE",
+      "integer",
+      3
+    ],
+    "repeat_after": [
+      "DISTRIBUTION_REPEAT_AFTER_DAYS",
+      "days",
+      90
+    ],
+    "hot_score_threshold": [
+      "HOT_SCORE_THRESHOLD",
+      "float",
+      18
+    ],
+    "hot_min_natural": [
+      "HOT_MIN_NATURAL_OCCURRENCES",
+      "integer",
+      5
+    ],
+    "hot_window": [
+      "HOT_WINDOW_DAYS",
+      "days",
+      7
+    ]
+  },
+  "classic": {
+    "min_natural_occurrences": [
+      "CLASSIC_MIN_NATURAL_OCCURRENCES",
+      "integer",
+      8
+    ],
+    "min_groups": [
+      "CLASSIC_MIN_NATURAL_GROUPS",
+      "integer",
+      3
+    ],
+    "min_lifespan": [
+      "CLASSIC_MIN_LIFESPAN_DAYS",
+      "days",
+      90
+    ],
+    "min_revivals": [
+      "CLASSIC_MIN_REVIVALS",
+      "integer",
+      1
+    ],
+    "revival_gap": [
+      "REVIVAL_GAP_DAYS",
+      "days",
+      30
+    ]
+  },
+  "claim": {
+    "ttl": [
+      "CLAIM_TTL_MINUTES",
+      "minutes",
+      10
+    ],
+    "max_attempts": [
+      "CLAIM_MAX_ATTEMPTS",
+      "integer",
+      6
+    ],
+    "token_length": [
+      "CLAIM_TOKEN_LENGTH",
+      "integer",
+      8
+    ]
+  },
+  "leaderboard": {
+    "period": [
+      "LEADERBOARD_PERIOD_DAYS",
+      "days",
+      7
+    ],
+    "limit": [
+      "LEADERBOARD_LIMIT",
+      "integer",
+      20
+    ]
+  },
+  "napcat": {
+    "enabled": [
+      "NAPCAT_ENABLED",
+      "boolean",
+      false
+    ],
+    "ws_url": [
+      "NAPCAT_WS_URL",
+      "string",
+      "ws://127.0.0.1:3001"
+    ],
+    "http_url": [
+      "NAPCAT_HTTP_URL",
+      "string",
+      "http://127.0.0.1:3001"
+    ],
+    "access_token": [
+      "NAPCAT_ACCESS_TOKEN",
+      "string",
+      ""
+    ],
+    "webhook_token": [
+      "NAPCAT_WEBHOOK_TOKEN",
+      "string",
+      ""
+    ],
+    "request_timeout": [
+      "NAPCAT_REQUEST_TIMEOUT_SECONDS",
+      "integer",
+      10
+    ],
+    "reaction_map": [
+      "NAPCAT_REACTION_MAP",
+      "json",
+      {
+        "128169": "💩",
+        "128514": "😂",
+        "129393": "🥱"
+      }
+    ],
+    "media_allowed_hosts": [
+      "NAPCAT_MEDIA_ALLOWED_HOSTS",
+      "list",
+      [
+        "multimedia.nt.qq.com",
+        "gchat.qpic.cn",
+        "c2cpicdw.qpic.cn"
+      ]
+    ],
+    "max_media_bytes": [
+      "NAPCAT_MAX_MEDIA_BYTES",
+      "integer",
+      20000000
+    ],
+    "event_retention": [
+      "RAW_EVENT_RETENTION_DAYS",
+      "days",
+      14
+    ],
+    "reconnect_delay": [
+      "NAPCAT_RECONNECT_SECONDS",
+      "integer",
+      5
+    ]
+  },
+  "storage": {
+    "provider": [
+      "STORAGE_PROVIDER",
+      "string",
+      "local"
+    ],
+    "local_root": [
+      "STORAGE_LOCAL_ROOT",
+      "string",
+      "storage/media"
+    ],
+    "endpoint": [
+      "STORAGE_ENDPOINT",
+      "string",
+      ""
+    ],
+    "bucket": [
+      "STORAGE_BUCKET",
+      "string",
+      ""
+    ],
+    "access_key": [
+      "STORAGE_ACCESS_KEY",
+      "string",
+      ""
+    ],
+    "secret_key": [
+      "STORAGE_SECRET_KEY",
+      "string",
+      ""
+    ],
+    "region": [
+      "STORAGE_REGION",
+      "string",
+      "us-east-1"
+    ]
+  },
+  "features": {
+    "trial": [
+      "FEATURE_TRIAL",
+      "boolean",
+      true
+    ],
+    "reputation": [
+      "FEATURE_REPUTATION",
+      "boolean",
+      true
+    ],
+    "phash": [
+      "FEATURE_PHASH",
+      "boolean",
+      true
+    ],
+    "public_groups": [
+      "FEATURE_PUBLIC_GROUPS",
+      "boolean",
+      true
+    ],
+    "web_rating": [
+      "FEATURE_WEB_RATING",
+      "boolean",
+      true
+    ],
+    "auto_classic": [
+      "FEATURE_AUTO_CLASSIC",
+      "boolean",
+      true
+    ],
+    "group_taste_profile": [
+      "FEATURE_GROUP_TASTE_PROFILE",
+      "boolean",
+      true
+    ]
+  },
+  "demo": {
+    "enabled": [
+      "DEMO_ENABLED",
+      "boolean",
+      true
+    ],
+    "seed": [
+      "SEED_DEMO",
+      "boolean",
+      true
+    ],
+    "email": [
+      "DEMO_EMAIL",
+      "string",
+      "curator@example.test"
+    ],
+    "password": [
+      "DEMO_PASSWORD",
+      "string",
+      "Museum-demo-2026!"
+    ]
+  },
+  "jobs": {
+    "threads": [
+      "JOB_THREADS",
+      "integer",
+      5
+    ],
+    "poll_interval": [
+      "JOB_POLL_INTERVAL",
+      "integer",
+      5
+    ],
+    "cron_enabled": [
+      "JOB_CRON_ENABLED",
+      "boolean",
+      true
+    ],
+    "maintenance_cron": [
+      "JOB_MAINTENANCE_CRON",
+      "string",
+      "* * * * *"
+    ],
+    "statistics_cron": [
+      "JOB_STATISTICS_CRON",
+      "string",
+      "*/15 * * * *"
+    ],
+    "attempts": [
+      "JOB_RETRY_ATTEMPTS",
+      "integer",
+      5
+    ]
+  },
+  "modes": {
+    "rules": [
+      "BOT_MODE_RULES",
+      "json",
+      {
+        "搬💩": {
+          "collect": true,
+          "distribute": false
+        },
+        "吃💩": {
+          "collect": false,
+          "distribute": true
+        },
+        "自助餐": {
+          "collect": true,
+          "distribute": true
+        }
+      }
+    ]
+  }
+}
