@@ -3,7 +3,7 @@ require_relative '../domain_helpers'
 class SimulationTest < ActiveSupport::TestCase
   include DomainHelpers
   setup do
-    @groups=10.times.map { domain_group(mode:'自助餐',trial_preference:'OPT_IN') }
+    @groups=10.times.map { domain_group(trial_preference:'OPT_IN') }
     @people=36.times.map { domain_transporter }
     @groups.each { |group| @people.each_with_index { |person,i| GroupMember.create!(group:group,transporter:person,role:i.zero? ? 'owner' : 'member') } }
     domain_bot(*@groups.first(5));domain_bot(*@groups.last(5))

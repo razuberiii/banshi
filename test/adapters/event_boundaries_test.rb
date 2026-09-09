@@ -87,7 +87,8 @@ class EventBoundariesTest < ActiveSupport::TestCase
     new_card=submit(group_payload(group,connection,notice_type:'group_card',user_id:connection.bot_account.external_id,card_new:'闭嘴',time:now+1),connection)
     Events::Processor.call(new_card)
     Events::Processor.call(old_card)
-    assert_equal '闭嘴',group.reload.mode
+    assert group.reload.can_collect?
+    assert group.can_distribute?
     assert_equal '闭嘴',group.group_bot_memberships.find_by!(bot_account:connection.bot_account).card
     person=domain_transporter
     joined=submit(group_payload(group,connection,notice_type:'group_increase',user_id:person.external_id,time:now),connection)
@@ -120,19 +121,33 @@ class EventBoundariesTest < ActiveSupport::TestCase
     end
     membership=group.group_bot_memberships.find_by!(bot_account:connection.bot_account)
     assert_equal '闭嘴',membership.card
-    refute group.reload.can_collect?
+    assert group.reload.can_collect?
+    assert group.can_distribute?
     membership.update!(active:false)
     Events::Processor.call(submit(payload.merge('message_id'=>'late-contact','time'=>payload['time']-1),connection))
     refute membership.reload.active
   end
 
-  test 'unconfirmed first contact never inherits the default collecting mode' do
+  test 'unconfirmed bot card does not disable default self service participation' do
     group=domain_group
     connection=domain_bot
     payload=group_payload(group,connection,post_type:'message',message_type:'group',user_id:'unknown-person',message_id:'unknown-contact',message:[{'type'=>'text','data'=>{'text'=>'hello'}}])
     Events::Processor.call(submit(payload,connection))
-    refute group.reload.can_collect?
-    refute group.can_distribute?
+    assert group.reload.can_collect?
+    assert group.can_distribute?
     assert_nil group.group_bot_memberships.find_by!(bot_account:connection.bot_account).card_event_at
+  end
+
+  test 'card updates from multiple bots cannot override saved group participation' do
+    group=domain_group(collect_enabled:false,distribute_enabled:true)
+    first=domain_bot(group)
+    second=domain_bot(group)
+    [first,second].each_with_index do |connection,index|
+      event=submit(group_payload(group,connection,notice_type:'group_card',user_id:connection.bot_account.external_id,card_new:index.zero? ? '自助餐' : '搬💩'),connection)
+      Events::Processor.call(event)
+    end
+    refute group.reload.can_collect?
+    assert group.can_distribute?
+    assert_equal [false,true],group.attributes.values_at('collect_enabled','distribute_enabled')
   end
 end

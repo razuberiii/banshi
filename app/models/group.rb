@@ -17,12 +17,19 @@ class Group < ApplicationRecord
   validates :external_id, :slug, uniqueness: true
   validates :visibility, inclusion: { in: %w[public statistics hidden] }
   validates :trial_preference, inclusion: { in: %w[OPT_IN FALLBACK OPT_OUT] }
+  validates :collect_enabled, :distribute_enabled, inclusion: { in: [true, false] }
   validates :daily_limit, :cooldown_minutes, numericality: { greater_than_or_equal_to: 0, only_integer: true }, allow_nil: true
   validate { errors.add(:accepted_tags, '包含未定义标签') unless (accepted_tags - AppConfig.safety.tags).empty? }
   def display_name = anonymous? ? anonymous_name : public_name
   def to_param = slug
-  def can_collect? = collect_enabled.nil? ? BotModeParser.call(mode).fetch(:collect) : collect_enabled
-  def can_distribute? = distribute_enabled.nil? ? BotModeParser.call(mode).fetch(:distribute) : distribute_enabled
+  def can_collect? = collect_enabled?
+  def can_distribute? = distribute_enabled?
+  def participation_name
+    return '自助餐' if can_collect? && can_distribute?
+    return '只采集' if can_collect?
+    return '只接收' if can_distribute?
+    '暂停参与'
+  end
   def effective_daily_limit = daily_limit || AppConfig.distribution.daily_limit
   def cooldown = cooldown_minutes.nil? ? AppConfig.distribution.cooldown : cooldown_minutes.minutes
   def available_connection

@@ -65,14 +65,11 @@ module Events
           card=@adapter.get_bot_card(group_external_id:@group.external_id).to_s
           confirmed=true
         rescue Adapters::OneBotAdapter::RemoteError,ActiveRecord::RecordNotFound,KeyError
-          # Unknown cards disable collection/distribution until a later card
-          # event or an explicit manager choice confirms a mode.
+          # Card lookup is optional metadata. Participation is configured on
+          # the website and starts in self-service mode even without a card.
         end
         @group.group_bot_memberships.create!(bot_account:@connection.bot_account,joined_at:@event.occurred_at,active:true,card:card,
           card_event_at:confirmed ? @event.occurred_at : nil,card_event_id:confirmed ? @event.id : nil)
-        if @group.mode_event_at.nil?
-          @group.update!(mode:card,mode_event_at:confirmed ? @event.occurred_at : nil,mode_event_id:confirmed ? @event.id : nil)
-        end
         AuditLog.create!(group:@group,category:'bot',action:'membership_bootstrapped',details:{bot_account_id:@connection.bot_account_id,card_confirmed:confirmed})
       end
     end
@@ -124,9 +121,6 @@ module Events
         membership.joined_at ||= @event.occurred_at
         return unless Ordering.newer?(@event,membership.card_event_at,membership.card_event_id)
         membership.update!(card:@event.metadata.fetch('card'),card_event_at:@event.occurred_at,card_event_id:@event.id)
-        if Ordering.newer?(@event,@group.mode_event_at,@group.mode_event_id)
-          @group.update!(mode:@event.metadata.fetch('card'),mode_event_at:@event.occurred_at,mode_event_id:@event.id)
-        end
         AuditLog.create!(group:@group,category:'bot',action:'card_changed',details:{bot_account_id:@connection.bot_account_id})
       end
     end

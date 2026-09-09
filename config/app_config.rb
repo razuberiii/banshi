@@ -72,9 +72,6 @@ module AppConfig
     end
     raise Invalid,'Safety hard tags must be defined' unless (c.safety.hard_block_tags-c.safety.tags).empty?
     raise Invalid,'Report threshold must be positive' unless c.safety.report_pause_threshold.positive?
-    unless c.modes.rules.all? { |name,rule| !name.empty? && rule.is_a?(Hash) && %w[collect distribute].all? { |key| [true,false].include?(rule[key]) } }
-      raise Invalid,'BOT_MODE_RULES must map names to collect/distribute booleans'
-    end
     raise Invalid,'NAPCAT_REACTION_MAP must map IDs to nonempty strings' unless c.napcat.reaction_map.values.all? { |value| value.is_a?(String) && !value.empty? }
     [c.trial.positive_threshold,c.trial.negative_max].each { |v| raise Invalid, 'Trial rates must be in 0..1' unless (0..1).cover?(v) }
     if c.system.environment == 'production'

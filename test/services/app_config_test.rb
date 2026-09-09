@@ -21,13 +21,6 @@ class AppConfigTest < ActiveSupport::TestCase
     assert_raises(RuntimeError) { AppConfig.with(candidate:{ttl:42}) { assert_equal 42,AppConfig.candidate.ttl;raise 'expected' } }
     assert_equal before,AppConfig.candidate.ttl
   end
-  test 'bot card parsing is a central extensible rule with safe unknown fallback' do
-    assert_equal({collect:true,distribute:false},BotModeParser.call('搬💩'))
-    assert_equal({collect:false,distribute:true},BotModeParser.call('吃💩'))
-    assert_equal({collect:true,distribute:true},BotModeParser.call('自助餐 · 值班中'))
-    assert_equal({collect:false,distribute:false},BotModeParser.call('休息'))
-  end
-
   test 'multiple connections resolve separate credentials without database secrets' do
     c=AppConfig.load({'NAPCAT_ENABLED'=>'true','NAPCAT_WEBHOOK_TOKEN'=>'ingress-test','NAPCAT_CONNECTION_TOKENS'=>'{"bot-a":"a-token","bot-b":"b-token"}'})
     assert_equal 'a-token',c.napcat.connection_tokens['bot-a']

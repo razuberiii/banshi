@@ -89,6 +89,29 @@ class MuseumTest < ActionDispatch::IntegrationTest
     assert_equal 'RED',AppConfig.safety.default_level
   end
 
+  test 'a claimed manager controls collection and delivery without a card mode selector' do
+    login
+    patch group_path(@group),params:{group:{collect_enabled:false,distribute_enabled:false}}
+    assert_response :forbidden
+    assert @group.reload.can_collect?
+    assert @group.can_distribute?
+    GroupManagement.create!(group:@group,user:@user,verified_role:'admin',verified_at:Time.current)
+    get edit_group_path(@group)
+    assert_response :success
+    assert_select 'select[name="group[mode]"]',count:0
+    assert_select 'input[type="checkbox"][name="group[collect_enabled]"]',count:1
+    assert_select 'input[type="checkbox"][name="group[distribute_enabled]"]',count:1
+    patch group_path(@group),params:{group:{collect_enabled:'0',distribute_enabled:'1',mode:'搬💩'}}
+    assert_redirected_to group_path(@group)
+    refute @group.reload.can_collect?
+    assert @group.can_distribute?
+    assert_nil Collector.collect(message:domain_message(group:@group))
+    @group.update!(distribute_enabled:false)
+    domain_bot(@group)
+    entry=domain_entry(safety_level:'GREEN',visibility:'public',level:'NORMAL')
+    assert_includes GroupMatcher.call(entry:entry,group:@group,kind:'BOT_DISTRIBUTION').reasons,'group_distribution_disabled'
+  end
+
   test 'report submission is persisted and urgent privacy hides the entry' do
     login
     get new_entry_report_path(@entry);assert_response :success

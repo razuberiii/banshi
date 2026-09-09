@@ -50,16 +50,15 @@ class ArchiveSeed
     @connections=@bots.map { |bot| BotConnection.create!(bot_account:bot,name:"#{bot.name} · Fake NapCat",adapter:'fake',status:'online',capabilities:{group_reactions:true,member_roles:true,forward_nodes:true,fictional:true}) }
     @people=PEOPLE.each_with_index.map { |name,i| Transporter.create!(external_id:"fake-person-#{format('%03d',i+1)}",display_name:name,public_profile:true) }
     @groups=GROUP_NAMES.each_with_index.map do |name,i|
-      mode=i<2 ? '自助餐' : (i%6==0 ? '搬💩' : i%6==1 ? '吃💩' : '自助餐')
       group=Group.create!(external_id:"fake-group-#{format('%03d',i+1)}",slug:"museum-#{format('%02d',i+1)}",public_name:name,anonymous_name:"匿名群馆 #{format('%02d',i+1)}",
-        anonymous:i==21,hide_members:i>=21,visibility:i==23 ? 'hidden' : i==22 ? 'statistics' : 'public',mode:mode,
+        anonymous:i==21,hide_members:i>=21,visibility:i==23 ? 'hidden' : i==22 ? 'statistics' : 'public',
         description:['这里保存我们不经意间留下的互联网碎片。群聊照常，考古继续。','一个对废话很认真的地方。没有专家，只有路过的群友。','老图不是过期了，只是在等下一次有人想起。'][i%3],
         trial_preference:i%5==4 ? 'OPT_OUT' : i%4==3 ? 'FALLBACK' : 'OPT_IN',daily_limit:4+i%5,cooldown_minutes:45+(i%3)*15,
         accepted_tags:i%4==0 ? %w[GROTESQUE HARASSMENT OTHER_SENSITIVE] : [],accept_archaeology:i.even?,
         joined_at:@now-(i<20 ? 240-i*7 : 24-i).days)
       @bots.each_with_index do |bot,j|
         next unless i<4 || (i%2)==j
-        GroupBotMembership.create!(group:group,bot_account:bot,card:mode,active:true,joined_at:group.joined_at)
+        GroupBotMembership.create!(group:group,bot_account:bot,card:bot.name,active:true,joined_at:group.joined_at)
       end
       @people.each_with_index { |person,j| GroupMember.create!(group:group,transporter:person,role:j==0 ? 'owner' : j==1 ? 'admin' : 'member',display_name:person.display_name) }
       TimelineEvent.create!(group:group,event_type:'group_joined',label:'群馆加入搬运网络',occurred_at:group.joined_at,dedupe_key:"seed:group:#{i}")

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_09_050000) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_09_060000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -318,7 +318,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_050000) do
   create_table "group_bot_memberships", force: :cascade do |t|
     t.bigint "group_id", null: false
     t.bigint "bot_account_id", null: false
-    t.string "card", default: "自助餐", null: false
+    t.string "card", default: "", null: false
     t.boolean "active", default: true, null: false
     t.datetime "joined_at", null: false
     t.datetime "created_at", null: false
@@ -370,9 +370,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_050000) do
     t.string "visibility", default: "statistics", null: false
     t.boolean "anonymous", default: true, null: false
     t.boolean "hide_members", default: true, null: false
-    t.string "mode", default: "自助餐", null: false
-    t.boolean "collect_enabled"
-    t.boolean "distribute_enabled"
+    t.boolean "collect_enabled", default: true, null: false
+    t.boolean "distribute_enabled", default: true, null: false
     t.string "trial_preference", default: "FALLBACK", null: false
     t.integer "daily_limit"
     t.integer "cooldown_minutes"
@@ -386,8 +385,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_050000) do
     t.jsonb "stats", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "mode_event_at"
-    t.bigint "mode_event_id"
     t.index ["external_id"], name: "idx_groups_0", unique: true
     t.index ["slug"], name: "idx_groups_1", unique: true
     t.index ["trial_preference", "last_trial_at"], name: "idx_groups_3"

@@ -203,12 +203,6 @@
 | `JOB_STATISTICS_CRON` | `jobs.statistics_cron` | string | */15 * * * * |
 | `JOB_RETRY_ATTEMPTS` | `jobs.attempts` | integer | 5 |
 
-## modes
-
-| ENV | AppConfig | 类型 / 输入单位 | 默认值 |
-| --- | --- | --- | --- |
-| `BOT_MODE_RULES` | `modes.rules` | json | {"搬💩":{"collect":true,"distribute":false},"吃💩":{"collect":false,"distribute":true},"自助餐":{"collect":true,"distribute":true}} |
-
 ## security
 
 | ENV | AppConfig | 类型 / 输入单位 | 默认值 |

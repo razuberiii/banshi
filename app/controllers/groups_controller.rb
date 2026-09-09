@@ -31,7 +31,6 @@ class GroupsController < ApplicationController
   def update
     return unless authorize_group!
     attributes=group_params
-    attributes=attributes.merge(mode_event_at:Time.current,mode_event_id:nil) if attributes.key?(:mode)
     if @group.update(attributes)
       AuditLog.create!(user:current_user,group:@group,category:'group',action:'preferences_updated',details:{fields:group_params.keys})
       redirect_to group_path(@group),notice:'本群胃口已更新。平台安全限制始终生效。'
@@ -49,7 +48,7 @@ class GroupsController < ApplicationController
     false
   end
   def group_params
-    permitted = params.require(:group).permit(:public_name,:description,:mode,:trial_preference,:daily_limit,:cooldown_minutes,:collect_enabled,:distribute_enabled,:accept_hot,:accept_classic,:accept_archaeology,:anonymous,:visibility,:hide_members,accepted_tags:[])
+    permitted = params.require(:group).permit(:public_name,:description,:trial_preference,:daily_limit,:cooldown_minutes,:collect_enabled,:distribute_enabled,:accept_hot,:accept_classic,:accept_archaeology,:anonymous,:visibility,:hide_members,accepted_tags:[])
     permitted[:accepted_tags] = Array(permitted[:accepted_tags]).reject(&:blank?) if permitted.key?(:accepted_tags)
     permitted
   end

@@ -6,9 +6,9 @@
 
 | 检查 | 实际结果 |
 | --- | --- |
-| 全部自动测试 | **115 runs, 791 assertions, 0 failures, 0 errors, 0 skips** |
+| 全部自动测试 | **119 runs, 822 assertions, 0 failures, 0 errors, 0 skips** |
 | Rails 自动加载 | `rails zeitwerk:check` 返回 `All is good!` |
-| 数据库迁移 | 4 份 migration 全部执行成功，包括领域表、GoodJob、模拟动作和事件顺序字段 |
+| 数据库迁移 | 5 份 migration 全部执行成功，包括领域表、GoodJob、模拟动作、事件顺序字段和显式群开关升级 |
 | 资源构建 | `rails assets:clobber` 后 `rails assets:precompile` 成功 |
 | JavaScript 语法 | `node --check app/assets/javascripts/application.js` 成功 |
 | Seed | 初始产生 24 群、36 搬运者、120 条目、1,285 条 Occurrence；再次 seed 保留已有历史 |
@@ -22,6 +22,8 @@
 本次终端模拟建立 `S-000133`，送达 5 个试吃群，试吃通过后保留同一个编号进入 NORMAL，再按自然生命周期成为 CLASSIC。编号来自数据库序列；干净安装时的具体编号可能不同。
 
 测试覆盖候选观察窗口、阈值、冷启动、作者自互动排除、过期、自然重现与机器人区别、回复独立人数、Reaction 幂等 / 撤销 / 乱序、SHA / DCT pHash、合并与撤销、安全硬限制、标签胃口、举报升级与显式恢复、试吃轮换、OPT_OUT、沉默 unknown、配额 / 冷却、HOT / CLASSIC、复活重算、认领一次性与实时角色复核、配置类型与开关、对象存储、Webhook 鉴权、消息 ID 冲突、权限与隐私页面。
+
+默认自助调整追加验证：新群无需认领即参与、未知名片不关闭业务、乱序名片只同步元数据、多机器人改名不覆盖设置、未认领用户无权设置、管理员两开关独立生效。迁移测试实际执行升级 / 回滚，验证空开关变为开启、显式关闭保留、历史 Message 归属不变。
 
 ## 数据库验证环境的准确边界
 

@@ -24,4 +24,6 @@ Spec: docs/architecture.md + 用户 60 节规格。
 Testing commands: bundle exec rails test; bundle exec rails zeitwerk:check; bundle exec rails db:prepare; bin/demo; HTTP route/request suite. Browser/render check where runtime supports it. Do not claim a check passed if it did not execute.
 
 ## 验收结果
-115 项自动测试 / 791 个断言通过。Puma 实际 HTTP 与独立 GoodJob 进程已启动验证；数据库验证使用 PostgreSQL WASM 引擎。Docker、原生并发、浏览器交互和真实 QQ / S3 的边界见 docs/verification.md。
+119 项自动测试 / 822 个断言通过。Puma 实际 HTTP 与独立 GoodJob 进程已启动验证；数据库验证使用 PostgreSQL WASM 引擎。Docker、原生并发、浏览器交互和真实 QQ / S3 的边界见 docs/verification.md。
+
+产品修订：按用户最新要求移除名片驱动的模式，默认自助餐，认领后由群页面设置采集与接收。目标仓库 razuberiii/banshi，以 PR 导入完整实现。

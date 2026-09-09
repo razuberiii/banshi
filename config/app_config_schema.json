@@ -638,26 +638,6 @@
       5
     ]
   },
-  "modes": {
-    "rules": [
-      "BOT_MODE_RULES",
-      "json",
-      {
-        "搬💩": {
-          "collect": true,
-          "distribute": false
-        },
-        "吃💩": {
-          "collect": false,
-          "distribute": true
-        },
-        "自助餐": {
-          "collect": true,
-          "distribute": true
-        }
-      }
-    ]
-  },
   "security": {
     "login_limit": [
       "LOGIN_RATE_LIMIT",
