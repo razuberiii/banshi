@@ -11,7 +11,7 @@ require_relative 'app_config'
 module Banshi
   class Application < Rails::Application
     config.load_defaults 8.0
-    config.time_zone = 'Asia/Tokyo'
+    config.time_zone = AppConfig.system.time_zone
     config.active_record.default_timezone = :utc
     config.active_job.queue_adapter = :good_job
     config.autoload_lib(ignore: %w[assets tasks])

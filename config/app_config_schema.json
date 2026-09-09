@@ -34,6 +34,11 @@
       "PAGE_SIZE",
       "integer",
       18
+    ],
+    "time_zone": [
+      "TIME_ZONE",
+      "string",
+      "Asia/Shanghai"
     ]
   },
   "database": {
@@ -51,6 +56,16 @@
       "DATABASE_POOL",
       "integer",
       12
+    ],
+    "prepared_statements": [
+      "DATABASE_PREPARED_STATEMENTS",
+      "boolean",
+      true
+    ],
+    "maintain_test_schema": [
+      "TEST_MAINTAIN_SCHEMA",
+      "boolean",
+      true
     ]
   },
   "candidate": {
@@ -468,6 +483,26 @@
       "NAPCAT_RECONNECT_SECONDS",
       "integer",
       5
+    ],
+    "max_forward_depth": [
+      "NAPCAT_MAX_FORWARD_DEPTH",
+      "integer",
+      5
+    ],
+    "max_forward_nodes": [
+      "NAPCAT_MAX_FORWARD_NODES",
+      "integer",
+      200
+    ],
+    "max_forward_media": [
+      "NAPCAT_MAX_FORWARD_MEDIA",
+      "integer",
+      50
+    ],
+    "max_media_pixels": [
+      "NAPCAT_MAX_MEDIA_PIXELS",
+      "integer",
+      40000000
     ]
   },
   "storage": {
@@ -616,6 +651,33 @@
           "distribute": true
         }
       }
+    ]
+  },
+  "security": {
+    "login_limit": [
+      "LOGIN_RATE_LIMIT",
+      "integer",
+      10
+    ],
+    "signup_limit": [
+      "SIGNUP_RATE_LIMIT",
+      "integer",
+      5
+    ],
+    "claim_limit": [
+      "CLAIM_RATE_LIMIT",
+      "integer",
+      10
+    ],
+    "rate_period": [
+      "AUTH_RATE_PERIOD_SECONDS",
+      "integer",
+      60
+    ],
+    "signup_period": [
+      "SIGNUP_RATE_PERIOD_SECONDS",
+      "integer",
+      300
     ]
   }
 }

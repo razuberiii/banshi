@@ -16,6 +16,8 @@ class ShitEntry < ApplicationRecord
   has_many :duplicate_matches
   before_validation :assign_sid, on: :create
   validates :sid, presence: true, uniqueness: true
+  validates :title,length:{maximum:120},allow_nil:true
+  validates :summary,length:{maximum:2000},allow_nil:true
   validates :level, inclusion: { in: LEVELS }
   validates :safety_level, inclusion: { in: %w[GREEN YELLOW RED] }
   validates :visibility, inclusion: { in: %w[public metadata_only hidden] }
@@ -33,6 +35,7 @@ class ShitEntry < ApplicationRecord
   end
   private
   def assign_sid
-    self.sid ||= format('S-%06d', self.class.connection.select_value("SELECT nextval('shit_entry_sid_seq')"))
+    self.id ||= self.class.connection.select_value("SELECT nextval(pg_get_serial_sequence('shit_entries', 'id'))").to_i
+    self.sid ||= format('S-%06d', id)
   end
 end

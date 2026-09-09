@@ -64,6 +64,18 @@ module AppConfig
     raise Invalid, 'Storage provider must be local or s3' unless %w[local s3].include?(c.storage.provider)
     raise Invalid, 'S3 requires a bucket' if c.storage.provider == 's3' && c.storage.bucket.empty?
     raise Invalid, 'Trial reaction definitions must be distinct' unless [c.trial.reaction_good,c.trial.reaction_funny,c.trial.reaction_bad].uniq.length == 3
+    raise Invalid, 'CLAIM_TOKEN_LENGTH must be in 6..32' unless (6..32).cover?(c.claim.token_length)
+    raise Invalid, 'PAGE_SIZE must be in 1..100' unless (1..100).cover?(c.system.page_size)
+    raise Invalid, 'Candidate must require at least one independent user' unless c.candidate.min_unique_users.positive?
+    %i[max_forward_depth max_forward_nodes max_forward_media max_media_pixels max_media_bytes request_timeout].each do |key|
+      raise Invalid,"NAPCAT_#{key.upcase} must be positive" unless c.napcat.public_send(key).positive?
+    end
+    raise Invalid,'Safety hard tags must be defined' unless (c.safety.hard_block_tags-c.safety.tags).empty?
+    raise Invalid,'Report threshold must be positive' unless c.safety.report_pause_threshold.positive?
+    unless c.modes.rules.all? { |name,rule| !name.empty? && rule.is_a?(Hash) && %w[collect distribute].all? { |key| [true,false].include?(rule[key]) } }
+      raise Invalid,'BOT_MODE_RULES must map names to collect/distribute booleans'
+    end
+    raise Invalid,'NAPCAT_REACTION_MAP must map IDs to nonempty strings' unless c.napcat.reaction_map.values.all? { |value| value.is_a?(String) && !value.empty? }
     [c.trial.positive_threshold,c.trial.negative_max].each { |v| raise Invalid, 'Trial rates must be in 0..1' unless (0..1).cover?(v) }
     if c.system.environment == 'production'
       raise Invalid, 'Set a unique SECRET_KEY_BASE (64+ chars)' if c.system.secret_key_base.length < 64 || c.system.secret_key_base.start_with?('development-only')

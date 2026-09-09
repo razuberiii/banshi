@@ -1,10 +1,6 @@
 class CreateArchiveDomain < ActiveRecord::Migration[8.0]
   def change
     enable_extension 'pg_trgm'
-    reversible do |dir|
-      dir.up { execute 'CREATE SEQUENCE shit_entry_sid_seq' }
-      dir.down { execute 'DROP SEQUENCE shit_entry_sid_seq' }
-    end
     create_table :users do |t|
       t.string :email, null: false
       t.string :password_digest, null: false
