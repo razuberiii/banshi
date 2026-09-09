@@ -1,0 +1,1 @@
+<% content_for :title, '传播时间线' %><section class="opening"><div><h1>整个馆，都在发生什么</h1><p>每一次发现、试吃、自然复读与复活，都有迹可循。</p></div></section><div class="timeline-page"><%= render 'shared/timeline',events:@events,show_entry:true %></div><%= render 'shared/pagination',total:@total,page:@page,size:30 %>

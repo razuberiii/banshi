@@ -27,11 +27,13 @@ Rails.application.routes.draw do
   get 'people/:public_id', to:'users#show', as: :profile
   resources :claims, only:[:index,:create,:show]
   get 'curation', to:'curation#index', as: :curation
+  post 'curation/candidates/:id', to:'curation#moderate_candidate', as: :moderate_candidate
   post 'curation/:sid/review', to:'curation#review', as: :review_entry
   post 'curation/reports/:id', to:'curation#resolve_report', as: :resolve_report
   post 'curation/:sid/merge', to:'curation#merge', as: :merge_entry
   post 'curation/merges/:id/revert', to:'curation#revert', as: :revert_merge
   post 'curation/assets/:id/hide', to:'curation#hide_asset', as: :hide_asset
+  post 'curation/assets/:id/redact', to:'curation#redact_asset', as: :redact_asset
   get 'demo', to:'demo#index', as: :demo
   post 'demo/actions', to:'demo#create', as: :demo_actions
   post 'onebot/:connection_id/events', to:'onebot#create', as: :onebot_events
