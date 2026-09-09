@@ -1,0 +1,12 @@
+<article class="entry-card">
+  <div class="accession"><%= link_to entry.sid,entry_path(entry),class:'mono' %><%= level_badge(entry) %></div>
+  <a class="card-media" href="<%= entry_path(entry) %>" aria-label="查看 <%= entry.display_title %>">
+    <% if entry.content.forward? %>
+      <div class="forward-preview"><span class="forward-label">群聊摘录 / <%= entry.content.forward_nodes.size %> 段</span><% entry.content.forward_nodes.first(3).each_with_index do |node,i| %><p class="quote-line"><span><%= format('%02d',i+1) %></span><%= truncate(node.body.to_s,length:45) %></p><% end %><span class="forward-foot">这条聊天记录被留了下来 ↗</span></div>
+    <% elsif (asset=entry.content.assets.find { |a| a.visibility=='visible' }) %>
+      <%= image_tag media_path(asset),alt:entry.display_title,loading:'lazy',width:560,height:420 %>
+    <% else %><div class="asset-missing">原始资源已下架<br><small>档案仍在</small></div><% end %>
+  </a>
+  <div class="card-caption"><h3><%= link_to entry.display_title,entry_path(entry) %></h3><div class="card-provenance"><%= group_link(entry.first_group) %><span><%= museum_date(entry.first_seen_at) %></span></div></div>
+  <div class="card-stats"><span><b><%= short_number(entry.natural_count) %></b> 次自然搬运</span><span><b><%= entry.natural_group_count %></b> 个群出土</span><% if entry.revival_count.positive? %><span class="red-text">复活 <%= entry.revival_count %> 次</span><% end %></div>
+</article>

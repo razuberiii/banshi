@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title><%= content_for?(:title) ? "#{yield(:title)} · 搬💩" : '搬💩 · 互联网群聊文化档案馆' %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="群聊里顺手一发，馆里认真存一份。收藏、试吃、复读与考古，留下互联网抽象内容的生命史。">
+  <%= csrf_meta_tags %>
+  <%= stylesheet_link_tag 'application', 'data-turbo-track':'reload' %>
+  <%= javascript_include_tag 'application', defer:true %>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到馆藏内容</a>
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="<%= root_path %>" aria-label="搬屎，返回首页"><span class="brand-seal">搬</span><span class="brand-word">搬<svg class="brand-icon" viewBox="0 0 30 30" aria-hidden="true"><path d="M14 2c6 1 8 5 5 8 5 0 7 5 3 8 8 2 7 10-1 10H7c-8 0-8-8-1-10-4-3-1-8 5-8 4-1 5-4 3-8Z" fill="currentColor"/><path d="M8 18h14M11 10h8" fill="none" stroke="white" stroke-width="1.5" opacity=".65"/></svg><small>互联网群聊文化档案馆</small></span></a>
+    <nav aria-label="主导航" class="primary-nav">
+      <%= link_to '逛馆藏',entries_path,class:controller_name=='entries' ? 'active' : nil %>
+      <%= link_to '抢先试吃',trials_path,class:controller_name=='trials' ? 'active' : nil %>
+      <%= link_to '典藏室',classics_path %>
+      <%= link_to '群馆',groups_path if AppConfig.features.public_groups %>
+      <%= link_to '排行榜',rankings_path,class:controller_name=='rankings' ? 'active' : nil %>
+    </nav>
+    <div class="header-actions">
+      <%= link_to '⌕',search_path,class:'search-link',aria:{label:'搜索馆藏'} %>
+      <% if signed_in? %><%= link_to current_user.display_name,profile_path(current_user),class:'visitor-link' %>
+      <% else %><%= link_to '领取入馆证',login_path,class:'button button-small' %><% end %>
+    </div>
+  </div>
+</header>
+<% if flash.any? %><div class="flash-stack" role="status"><% flash.each do |type,message| %><div class="flash <%= type %>"><%= message %></div><% end %></div><% end %>
+<main id="main" class="site-main"><%= yield %></main>
+<footer class="site-footer"><div class="footer-inner"><div><b>搬💩</b><p>互联网会忘记，但复读不会。</p></div><div class="footer-links"><%= link_to '搬运员名录',transporters_path %><%= link_to '传播时间线',timeline_path %><%= link_to '认领群馆',claims_path %><%= link_to '模拟 QQ 实验室',demo_path if AppConfig.demo.enabled %><%= link_to '馆务',curation_path if current_user&.curator? %></div><span class="edition">民间馆藏 / v0.1<br>不以沉默为差评</span></div></footer>
+</body></html>

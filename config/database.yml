@@ -1,0 +1,13 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  prepared_statements: <%= AppConfig.database.prepared_statements %>
+  pool: <%= AppConfig.database.pool %>
+  url: <%= AppConfig.database.url %>
+development:
+  <<: *default
+test:
+  <<: *default
+  url: <%= AppConfig.database.test_url %>
+production:
+  <<: *default

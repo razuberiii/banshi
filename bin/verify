@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+bundle exec rails zeitwerk:check
+RAILS_ENV=test bundle exec rails db:prepare
+bundle exec rails test

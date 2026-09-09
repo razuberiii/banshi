@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+require 'io/console'
+require_relative '../config/environment'
+print 'Email: '
+email=$stdin.gets.to_s.strip
+print 'Display name: '
+name=$stdin.gets.to_s.strip
+print 'Password (12+ characters): '
+password=$stdin.noecho(&:gets).to_s.chomp
+puts
+raise 'Email already registered; use an explicit maintenance operation to change an existing role.' if User.exists?(email:email.downcase)
+user=User.create!(email:email,display_name:name,password:password,site_role:'curator')
+puts "Created curator #{user.display_name}."

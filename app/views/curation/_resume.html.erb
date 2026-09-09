@@ -1,0 +1,10 @@
+<% if entry.distribution_paused? %>
+  <div class="notice notice-alert">
+    <strong>自动传播已暂停</strong>
+    <p>处理所有举报、完成安全审核与资源替换后，馆务可以明确恢复。高热度和关闭举报都不会自动解锁。</p>
+    <%= form_with url:resume_distribution_path(entry),class:'curation-fields' do |f| %>
+      <label>复核依据<%= f.text_field :reason,required:true,placeholder:'说明为何现在允许恢复传播' %></label>
+      <%= f.submit '记录复核并恢复传播',class:'button button-ghost' %>
+    <% end %>
+  </div>
+<% end %>
