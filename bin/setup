@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")/.."
+bundle check || bundle install
+bundle exec rails db:prepare
+bundle exec rails db:seed
+printf 'Ready. Run bin/dev and bin/jobs in separate terminals.\n'

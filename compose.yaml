@@ -1,0 +1,55 @@
+name: banshi
+x-app: &app
+  build: .
+  image: banshi:v0.1
+  env_file:
+    - path: .env
+      required: false
+  environment: &environment
+    RAILS_ENV: development
+    DATABASE_URL: postgresql://banshi:banshi_dev_only@db:5432/banshi_development
+    TEST_DATABASE_URL: postgresql://banshi:banshi_dev_only@db:5432/banshi_test
+    STORAGE_LOCAL_ROOT: /app/storage/media
+    ALLOWED_HOSTS: localhost,127.0.0.1,web
+  volumes:
+    - media:/app/storage/media
+  init: true
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:16-bookworm
+    environment:
+      POSTGRES_USER: banshi
+      POSTGRES_PASSWORD: banshi_dev_only
+      POSTGRES_DB: banshi_development
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U banshi -d banshi_development"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+  web:
+    <<: *app
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, http://127.0.0.1:3000/up]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
+  worker:
+    <<: *app
+    command: [bundle, exec, good_job, start]
+    depends_on:
+      web:
+        condition: service_healthy
+volumes:
+  postgres:
+  media:

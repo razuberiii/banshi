@@ -13,12 +13,15 @@ Spec: docs/architecture.md + 用户 60 节规格。
 - 多 Bot，Group 历史独立；真实的 SHA256 与 pHash；公开页面不泄露 QQ 标识。
 
 ## Tasks
-- [ ] 1. Foundation: Gemfile/config/environment, migrations, model relations, typed AppConfig. Verify boot/config/db constraints; commit.
-- [ ] 2. Input/storage/duplicates: normalized event builder, adapters, local/S3, real DCT pHash and reversible merge. Contract tests for idempotency/out-of-order and hash distances; commit.
-- [ ] 3. Collector/reputation: candidate observation, explanation ledger, natural occurrences and revival. Boundary/clock/cold-start tests; commit.
-- [ ] 4. Safety/trial/distribution: safety audit, reports, seat rotation, unique feedback, rate reservations, timed evaluations and classic. Safety priority/unknown/retry/quota tests; commit.
-- [ ] 5. Website/auth: public entry/group/transporter/ranking/search routes, login/register/profile/favorites/ratings/reports, claim and scoped management. Request/authorization/privacy tests; commit.
-- [ ] 6. Fake QQ + seeds: persistent virtual members/messages/cards, stepwise simulation through actual EventProcessor, rich original safe fixtures. End-to-end lifecycle tests; commit.
-- [ ] 7. Operations/docs: recurring jobs, structured logging, Docker and boot scripts, complete ENV/reference/README, integration validation, packaging with Git history; commit.
+- [x] 1. Foundation: Gemfile/config/environment, migrations, model relations, typed AppConfig. Verify boot/config/db constraints; commit.
+- [x] 2. Input/storage/duplicates: normalized event builder, adapters, local/S3, real DCT pHash and reversible merge. Contract tests for idempotency/out-of-order and hash distances; commit.
+- [x] 3. Collector/reputation: candidate observation, explanation ledger, natural occurrences and revival. Boundary/clock/cold-start tests; commit.
+- [x] 4. Safety/trial/distribution: safety audit, reports, seat rotation, unique feedback, rate reservations, timed evaluations and classic. Safety priority/unknown/retry/quota tests; commit.
+- [x] 5. Website/auth: public entry/group/transporter/ranking/search routes, login/register/profile/favorites/ratings/reports, claim and scoped management. Request/authorization/privacy tests; commit.
+- [x] 6. Fake QQ + seeds: persistent virtual members/messages/cards, stepwise simulation through actual EventProcessor, rich original safe fixtures. End-to-end lifecycle tests; commit.
+- [x] 7. Operations/docs: recurring jobs, structured logging, Docker and boot scripts, complete ENV/reference/README, integration validation, packaging with Git history; commit.
 
 Testing commands: bundle exec rails test; bundle exec rails zeitwerk:check; bundle exec rails db:prepare; bin/demo; HTTP route/request suite. Browser/render check where runtime supports it. Do not claim a check passed if it did not execute.
+
+## 验收结果
+115 项自动测试 / 791 个断言通过。Puma 实际 HTTP 与独立 GoodJob 进程已启动验证；数据库验证使用 PostgreSQL WASM 引擎。Docker、原生并发、浏览器交互和真实 QQ / S3 的边界见 docs/verification.md。

@@ -1,0 +1,13 @@
+.git
+.bundle
+.env
+.env.*
+!.env.example
+vendor/bundle
+log
+tmp
+storage
+coverage
+public/assets
+*.zip
+*.bundle
