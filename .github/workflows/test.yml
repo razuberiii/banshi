@@ -27,3 +27,34 @@ jobs:
           ruby-version: '3.3'
           bundler-cache: true
       - run: bin/verify
+  production-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate isolated private configuration
+        run: |
+          bin/prepare-production /tmp/napcat-banshi
+          docker network create banshi-napcat
+      - name: Start production Rails PostgreSQL worker and bridge
+        run: docker compose -f compose.production.yaml up -d --build --wait --wait-timeout 180
+      - name: Verify production website and database
+        run: |
+          curl --fail --silent http://127.0.0.1:3300/up >/dev/null
+          docker compose -f compose.production.yaml exec -T web bin/rails runner 'abort "database unavailable" unless ActiveRecord::Base.connection.select_value("SELECT 1") == 1'
+          docker compose -f compose.production.yaml exec -T -e RAILS_ENV=test -e NAPCAT_ENABLED=false -e DEMO_ENABLED=true web bin/verify
+      - name: Start official NapCat and verify logged-out WebUI
+        run: |
+          docker compose -f /tmp/napcat-banshi/compose.yaml up -d
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:6099/webui >/dev/null; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://127.0.0.1:6099/webui >/dev/null
+          curl --fail --silent http://127.0.0.1:3300/up >/dev/null
+          docker image inspect mlikiowa/napcat-docker:latest --format '{{index .RepoDigests 0}}'
+      - name: Stop isolated test services
+        if: always()
+        run: |
+          docker compose -f compose.production.yaml down
+          docker compose -f /tmp/napcat-banshi/compose.yaml down
