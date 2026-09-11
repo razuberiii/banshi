@@ -3,9 +3,9 @@
 set -euo pipefail
 exec 9>/run/lock/banshi-https.lock
 flock -n 9 || exit 0
-cert=/etc/letsencrypt/live/banshi.rubusoo.com/fullchain.pem
+cert=/etc/letsencrypt/live/rubusoo.com/fullchain.pem
 if [[ ! -s "$cert" ]]; then
-  certbot certonly --webroot -w /var/www/certbot -d banshi.rubusoo.com --non-interactive --agree-tos
+  certbot certonly --dns-cloudflare --dns-cloudflare-credentials /etc/letsencrypt/cloudflare-banshi.ini --dns-cloudflare-propagation-seconds 30 --cert-name rubusoo.com -d rubusoo.com -d '*.rubusoo.com' --non-interactive --agree-tos
 fi
 openssl x509 -in "$cert" -noout -checkend 86400
 site=/etc/nginx/sites-available/banshi.rubusoo.com

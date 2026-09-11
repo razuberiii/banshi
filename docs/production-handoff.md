@@ -82,17 +82,20 @@ CI 同时执行 Ruby 单元/集成测试与 Docker production smoke：实际构�
 
 本机已真实运行 `/opt/stacks/banshi`（指向仓库）和 `/opt/stacks/napcat-banshi`。Docker 开机启动，PostgreSQL、Rails、GoodJob、bridge、NapCat 均为 `unless-stopped`；已验证 Rails 重启和 NapCat 容器重建。旧原生 PostgreSQL 数据已备份至 `/opt/stacks/banshi-backups`，生产数据库无模拟内容。
 
-网站域名为 `banshi.rubusoo.com`。部署时 Let’s Encrypt 对本域名及现有域名的二次 DNS 校验均返回 networking error，公网 HTTP challenge 本身可达。当前 HTTP 仅开放公开读取，登录/注册/维护入口及写操作关闭；某些浏览器自动升级 HTTPS 后会暂时看到 Cloudflare 525。不能把此状态视为 HTTPS 已完成。
+网站正式地址为 https://banshi.rubusoo.com 。HTTP 自动跳转 HTTPS。已通过 Cloudflare DNS-01 签发覆盖 `rubusoo.com` 和 `*.rubusoo.com` 的公开可信 Let’s Encrypt 证书，首次有效期至 2026-12-10；原 HTTP-01 二次解析失败已通过 DNS-01 路径解决，旧 banshi-https.timer 已停用。
 
-服务器 `banshi-https.timer` 每小时重试。证书成功签发后，root-owned `/usr/local/sbin/banshi-enable-https` 自动安装独立 Nginx HTTPS 配置并停止此重试 timer；之后由现有 certbot.timer 正常续期。模板在 `deploy/nginx`，不修改其他站点。检查实时状态：
+服务器证书：`/etc/letsencrypt/live/rubusoo.com/fullchain.pem`；私钥：`/etc/letsencrypt/live/rubusoo.com/privkey.pem`。自动续期使用现有 certbot.timer，成功后 reload Nginx。Cloudflare DNS 凭证只保存在 root 权限 0600 的 `/etc/letsencrypt/cloudflare-banshi.ini`，不提交 Git。后续其他一级子域名可引用同一证书；不覆盖多级子域名。
+
+检查状态：
 
 ```bash
-sudo systemctl list-timers banshi-https.timer
-sudo journalctl -u banshi-https.service -n 30
 curl -I https://banshi.rubusoo.com
+sudo certbot certificates
+sudo systemctl list-timers certbot.timer
+sudo certbot renew --cert-name rubusoo.com --dry-run
 ```
 
-在证书恢复前，可通过 SSH 隧道访问 `http://localhost:3300` 检查网站；WebUI 始终使用 `http://localhost:6099/webui`。QQ 登录和自动采集/分发不依赖公网证书。WebUI Token 的安全读取命令（在自己的 SSH 终端运行，不把输出分享出去）：
+WebUI 始终通过 SSH 隧道使用 `http://localhost:6099/webui`。WebUI Token 的安全读取命令（在自己的 SSH 终端运行，不把输出分享出去）：
 
 ```bash
 python3 -c 'import json; print(json.load(open("/opt/stacks/napcat-banshi/config/webui.json"))["token"])'
