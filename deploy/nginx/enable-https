@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Install root-owned at /usr/local/sbin/banshi-enable-https.
+set -euo pipefail
+exec 9>/run/lock/banshi-https.lock
+flock -n 9 || exit 0
+cert=/etc/letsencrypt/live/banshi.rubusoo.com/fullchain.pem
+if [[ ! -s "$cert" ]]; then
+  certbot certonly --webroot -w /var/www/certbot -d banshi.rubusoo.com --non-interactive --agree-tos
+fi
+openssl x509 -in "$cert" -noout -checkend 86400
+site=/etc/nginx/sites-available/banshi.rubusoo.com
+backup=$(mktemp)
+trap 'rm -f "$backup"' EXIT
+cp "$site" "$backup"
+install -m 644 /usr/local/lib/banshi/nginx-https.conf "$site"
+if ! nginx -t; then
+  cp "$backup" "$site"
+  exit 1
+fi
+systemctl reload nginx
+systemctl disable --now banshi-https.timer

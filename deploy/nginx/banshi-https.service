@@ -1,0 +1,9 @@
+[Unit]
+Description=Issue Banshi TLS certificate and activate its HTTPS site
+After=network-online.target nginx.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/banshi-enable-https
+TimeoutStartSec=300

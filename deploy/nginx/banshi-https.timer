@@ -1,0 +1,11 @@
+[Unit]
+Description=Retry Banshi certificate issuance while external DNS validation is unavailable
+
+[Timer]
+OnBootSec=15min
+OnUnitActiveSec=1h
+RandomizedDelaySec=5min
+Unit=banshi-https.service
+
+[Install]
+WantedBy=timers.target

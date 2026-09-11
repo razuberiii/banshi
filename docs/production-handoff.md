@@ -77,3 +77,25 @@ CI 同时执行 Ruby 单元/集成测试与 Docker production smoke：实际构�
 发布不能仅凭配置文件声称已部署。必须实际检查容器、WebUI、网络、未登录稳定性与 CI。真实 QQ 采集/发送/Reaction 需要扫码后的现场验证；旧版本 Reaction 缺失 actor 或 is_add 时会被忽略，不能伪造投票。
 
 官方依据： [NapCat Docker](https://github.com/NapNeko/NapCat-Docker)、[NapCatQQ](https://github.com/NapNeko/NapCatQQ)、[OneBot 11](https://github.com/botuniverse/onebot-11)。本轮核对 NapCatQQ commit `109d0c1dff755875f3b79795e99cee6115289fbb` 的配置 schema、账号默认配置继承、get_login_info、get_group_list、get_forward_msg 与 group_msg_emoji_like 事件；这属于源码核对，不是 QQ 在线验收。
+
+## rubusoo.com 服务器（2026-09-11）
+
+本机已真实运行 `/opt/stacks/banshi`（指向仓库）和 `/opt/stacks/napcat-banshi`。Docker 开机启动，PostgreSQL、Rails、GoodJob、bridge、NapCat 均为 `unless-stopped`；已验证 Rails 重启和 NapCat 容器重建。旧原生 PostgreSQL 数据已备份至 `/opt/stacks/banshi-backups`，生产数据库无模拟内容。
+
+网站域名为 `banshi.rubusoo.com`。部署时 Let’s Encrypt 对本域名及现有域名的二次 DNS 校验均返回 networking error，公网 HTTP challenge 本身可达。当前 HTTP 仅开放公开读取，登录/注册/维护入口及写操作关闭；某些浏览器自动升级 HTTPS 后会暂时看到 Cloudflare 525。不能把此状态视为 HTTPS 已完成。
+
+服务器 `banshi-https.timer` 每小时重试。证书成功签发后，root-owned `/usr/local/sbin/banshi-enable-https` 自动安装独立 Nginx HTTPS 配置并停止此重试 timer；之后由现有 certbot.timer 正常续期。模板在 `deploy/nginx`，不修改其他站点。检查实时状态：
+
+```bash
+sudo systemctl list-timers banshi-https.timer
+sudo journalctl -u banshi-https.service -n 30
+curl -I https://banshi.rubusoo.com
+```
+
+在证书恢复前，可通过 SSH 隧道访问 `http://localhost:3300` 检查网站；WebUI 始终使用 `http://localhost:6099/webui`。QQ 登录和自动采集/分发不依赖公网证书。WebUI Token 的安全读取命令（在自己的 SSH 终端运行，不把输出分享出去）：
+
+```bash
+python3 -c 'import json; print(json.load(open("/opt/stacks/napcat-banshi/config/webui.json"))["token"])'
+```
+
+本机生产镜像已执行 `bin/verify`：127 tests / 854 assertions，零失败。GoodJob 维护任务实际执行成功，私有网络可达 NapCat WebUI；经 WebUI 鉴权查询确认 `isLogin=false` 且二维码可用。未登录时 OneBot HTTP/WS 尚未监听是 NapCat 当前行为，因此真实 QQ API 发送/收取仍必须在扫码后验证。
