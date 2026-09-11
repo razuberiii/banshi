@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_09_09_060000) do
+ActiveRecord::Schema[8.0].define(version: 2026_09_11_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -327,6 +327,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_09_09_060000) do
     t.bigint "membership_event_id"
     t.datetime "card_event_at"
     t.bigint "card_event_id"
+    t.string "role", default: "member", null: false
     t.index ["bot_account_id"], name: "index_group_bot_memberships_on_bot_account_id"
     t.index ["group_id", "bot_account_id"], name: "idx_group_bot_memberships_0", unique: true
     t.index ["group_id"], name: "index_group_bot_memberships_on_group_id"

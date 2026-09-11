@@ -36,7 +36,7 @@ module Events
       @base = {event_id: "notice:#{Digest::SHA256.hexdigest(JSON.generate(payload))}",event_type:'UnsupportedEvent', group_external_id: payload['group_id']&.to_s, sender_external_id:payload['user_id']&.to_s, message_external_id:payload['message_id']&.to_s, occurred_at:Time.at(Integer(payload.fetch('time',Time.now.to_i))), reply_to_message_id:nil,content_type:nil,media_references:[],metadata:{}}
     end
     def call
-      return message if @p['post_type']=='message' && @p['message_type']=='group'
+      return message if %w[message message_sent].include?(@p['post_type']) && @p['message_type']=='group'
       return reactions if @p['post_type']=='notice' && @p['notice_type']=='group_msg_emoji_like'
       if @p['notice_type']=='group_card' && @p['user_id'].to_s==@bot
         return [envelope(event_type:'BotGroupCardChanged',metadata:{'card'=>@p['card_new'].to_s})]

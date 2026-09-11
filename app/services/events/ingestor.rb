@@ -1,6 +1,7 @@
 module Events
   class Ingestor
     def self.call(payload:, connection:, enqueue: true)
+      DomainLog.emit('qq.event.received', connection_id: connection.id, post_type: payload['post_type'])
       digest=Digest::SHA256.hexdigest(JSON.generate(payload))
       raw=RawEvent.create_or_find_by!(bot_connection:connection,digest:digest) do |r|
         r.payload=Normalizer.redact(payload); r.received_at=Time.current

@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+"""Create private deployment configuration once; never print credentials."""
+import json
+import os
+from pathlib import Path
+import secrets
+import shutil
+import sys
+
+root = Path(__file__).resolve().parent.parent
+stack = Path(sys.argv[1] if len(sys.argv) > 1 else '/opt/stacks/napcat-banshi')
+env = root / '.env.production'
+if env.exists() or (stack / 'config/onebot11.json').exists():
+    raise SystemExit('Existing configuration preserved. Edit it explicitly; initialization is one-time.')
+os.umask(0o077)
+stack.mkdir(parents=True, exist_ok=True)
+config = stack / 'config'
+config.mkdir(exist_ok=True)
+password, access, webui = [secrets.token_hex(32) for _ in range(3)]
+values = {
+    'RAILS_ENV': 'production', 'SECRET_KEY_BASE': secrets.token_hex(64),
+    'POSTGRES_USER': 'banshi', 'POSTGRES_DB': 'banshi_production', 'POSTGRES_PASSWORD': password,
+    'DATABASE_URL': f'postgresql://banshi:{password}@db:5432/banshi_production',
+    'TEST_DATABASE_URL': f'postgresql://banshi:{password}@db:5432/banshi_test',
+    'DEMO_ENABLED': 'false', 'SEED_DEMO': 'false', 'ALLOWED_HOSTS': 'localhost,127.0.0.1,web',
+    'NAPCAT_ENABLED': 'true', 'NAPCAT_HTTP_URL': 'http://napcat:3000', 'NAPCAT_WS_URL': 'ws://napcat:3001',
+    'NAPCAT_ACCESS_TOKEN': access, 'NAPCAT_WEBHOOK_TOKEN': secrets.token_hex(32),
+    'DISTRIBUTION_ENABLED': 'true', 'DISTRIBUTION_BATCH_SIZE': '3',
+    'DISTRIBUTION_NEXT_ROUND_MINUTES': '15', 'DISTRIBUTION_MIN_FEEDBACK': '1',
+    'TRIAL_ENABLED': 'true', 'TRIAL_REQUIRED_BEFORE_DISTRIBUTION': 'false'
+}
+with env.open('x') as file:
+    file.write(''.join(f'{key}={value}\n' for key, value in values.items()))
+network = {
+    'httpServers': [{'enable': True, 'name': 'banshi-http', 'host': '0.0.0.0', 'port': 3000,
+                     'token': access, 'enableCors': False, 'enableWebsocket': False, 'debug': False}],
+    'httpSseServers': [], 'httpClients': [], 'websocketClients': [],
+    'websocketServers': [{'enable': True, 'name': 'banshi-events', 'host': '0.0.0.0', 'port': 3001,
+                          'token': access, 'reportSelfMessage': True, 'enableForcePushEvent': True,
+                          'messagePostFormat': 'array', 'debug': False, 'heartInterval': 30000}],
+    'plugins': []
+}
+(config / 'onebot11.json').write_text(json.dumps({'network': network, 'musicSignUrl': '',
+    'enableLocalFile2Url': False, 'parseMultMsg': False}, indent=2))
+(config / 'webui.json').write_text(json.dumps({'host': '0.0.0.0', 'port': 6099, 'prefix': '',
+    'token': webui, 'loginRate': 3}, indent=2))
+# Container user must read configuration; parent stack remains owner-only.
+config.chmod(0o755)
+for file in config.iterdir():
+    file.chmod(0o644)
+shutil.copyfile(root / 'deploy/napcat/compose.yaml', stack / 'compose.yaml')
+print(f'Private configuration created: {env}; NapCat stack: {stack}')
+print('Create Docker network banshi-napcat, start the NapCat stack, then compose.production.yaml.')

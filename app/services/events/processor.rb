@@ -87,6 +87,8 @@ module Events
           Interaction.create_or_find_by!(identity_key:"reply:#{@group.id}:#{message.external_id}") do |i|
             i.assign_attributes(group:@group,transporter:sender,message:target,internal_event:@event,target_external_id:@event.reply_to_message_id,kind:'reply',occurred_at:@event.occurred_at)
           end
+          DomainLog.emit('reply.received', group_id: @group.id, message_id: target&.id)
+          GroupStatsRefreshJob.perform_later(@group.id)
           EntryStatsRefresh.call(target.shit_occurrence.shit_entry) if target&.shit_occurrence
         end
         Collector.collect(message:message) if content
@@ -104,6 +106,8 @@ module Events
         i.assign_attributes(group:@group,transporter:sender,message:target,internal_event:@event,target_external_id:@event.message_external_id,kind:'reaction',reaction:emoji,active:@event.metadata.fetch('active'),occurred_at:@event.occurred_at)
         i.save!
       end
+      DomainLog.emit('reaction.received', group_id: @group.id, message_id: target&.id)
+      GroupStatsRefreshJob.perform_later(@group.id)
       EntryStatsRefresh.call(target.shit_occurrence.shit_entry) if target&.shit_occurrence
     end
     def verify_claim

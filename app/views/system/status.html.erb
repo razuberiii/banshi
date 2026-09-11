@@ -1,0 +1,16 @@
+<% content_for :title, 'System status' %>
+<section class="opening"><div><p class="mono">Banshi / Operations</p><h1>System status</h1></div></section>
+<dl class="system-status">
+  <dt>Rails</dt><dd>ONLINE</dd>
+  <dt>Database</dt><dd><%= @database ? 'ONLINE' : 'OFFLINE' %></dd>
+  <dt>Worker</dt><dd><%= @worker ? 'ONLINE' : 'OFFLINE' %></dd>
+  <dt>NapCat</dt><dd><%= @napcat %></dd>
+  <% @connections.each do |connection| %>
+    <dt>Bot · <%= connection.name %></dt><dd>QQ <%= connection.bot_account.external_id %> · <%= connection.status.upcase %></dd>
+  <% end %>
+  <dt>Groups</dt><dd><%= @groups %> connected</dd>
+  <dt>Pending candidates</dt><dd><%= @candidates %></dd>
+  <dt>Delivery queue</dt><dd><%= @deliveries %></dd>
+  <dt>Last QQ event</dt><dd><%= @last_event ? "#{time_ago_in_words(@last_event)} ago" : 'Waiting for first event' %></dd>
+  <dt>Distribution</dt><dd><%= AppConfig.distribution.enabled ? 'ENABLED' : 'DISABLED' %></dd>
+</dl>

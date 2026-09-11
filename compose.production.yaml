@@ -1,0 +1,56 @@
+name: banshi
+x-app: &app
+  build: .
+  image: banshi:v0.1
+  env_file: .env.production
+  environment:
+    RAILS_ENV: production
+    STORAGE_LOCAL_ROOT: /app/storage/media
+  volumes:
+    - media:/app/storage/media
+  networks: [default, napcat]
+  init: true
+  restart: unless-stopped
+  logging:
+    driver: json-file
+    options: { max-size: '10m', max-file: '3' }
+services:
+  db:
+    image: postgres:16-bookworm
+    env_file: .env.production
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U banshi -d banshi_production']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+  web:
+    <<: *app
+    ports: ['127.0.0.1:3300:3000']
+    depends_on:
+      db: { condition: service_healthy }
+    healthcheck:
+      test: [CMD, curl, --fail, --silent, http://127.0.0.1:3000/up]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
+  worker:
+    <<: *app
+    command: [bundle, exec, good_job, start]
+    depends_on:
+      web: { condition: service_healthy }
+  bridge:
+    <<: *app
+    command: [bin/napcat-bridge]
+    depends_on:
+      web: { condition: service_healthy }
+volumes:
+  postgres:
+  media:
+networks:
+  napcat:
+    external: true
+    name: banshi-napcat

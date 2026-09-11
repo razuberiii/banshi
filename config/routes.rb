@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   root 'home#index'
+  get 'system/status', to: 'system#status', as: :system_status
   get 'up' => 'rails/health#show', as: :rails_health_check
   get 'health/details', to:'curation#health'
   get 'search', to:'entries#index', as: :search

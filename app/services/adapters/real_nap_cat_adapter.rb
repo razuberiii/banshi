@@ -4,6 +4,8 @@ module Adapters
   # HTTP actions + shared webhook/reverse-WS normalizer; all product decisions remain outside this class.
   class RealNapCatAdapter < OneBotAdapter
     def initialize(connection) = @connection = connection
+    def get_login_info = action('get_login_info')
+    def get_group_list = action('get_group_list')
     def get_group_info(group_external_id:) = action('get_group_info',group_id:group_external_id)
     def get_group_member_info(group_external_id:,user_external_id:) = action('get_group_member_info',group_id:group_external_id,user_id:user_external_id,no_cache:true)
     def get_bot_card(group_external_id:) = get_group_member_info(group_external_id:group_external_id,user_external_id:@connection.bot_account.external_id).fetch('card','')
@@ -11,13 +13,11 @@ module Adapters
     def get_message(message_external_id:) = action('get_msg',message_id:message_external_id)
     def set_bot_card(group:,card:) = action('set_group_card',group_id:group.external_id,user_id:@connection.bot_account.external_id,card:card)
     def send_content(group:,entry:,kind:,idempotency_key:)
-      intro="#{entry.sid} · #{entry.display_title}"
-      if kind=='BOT_TRIAL'
-        intro += "\n抢先试吃 · 可选反馈 #{AppConfig.trial.reaction_good} 好屎 / #{AppConfig.trial.reaction_funny} 有节目效果 / #{AppConfig.trial.reaction_bad} 水。沉默不计差评。"
-      end
+      intro = entry.sid
+      intro += ' · Early' if kind == 'BOT_TRIAL'
       if entry.content.forward?
         nodes=Media::ForwardStructure.onebot_nodes(entry.content,bot_external_id:@connection.bot_account.external_id) { |asset|image_data(asset) }
-        nodes.unshift({'type'=>'node','data'=>{'nickname'=>'搬💩','user_id'=>@connection.bot_account.external_id,'content'=>[{'type'=>'text','data'=>{'text'=>intro}}]}})
+        nodes.unshift({'type'=>'node','data'=>{'nickname'=>'Banshi','user_id'=>@connection.bot_account.external_id,'content'=>[{'type'=>'text','data'=>{'text'=>intro}}]}})
         send_action('send_group_forward_msg',{group_id:group.external_id,messages:nodes})
       else
         segments=[{'type'=>'text','data'=>{'text'=>intro}}]

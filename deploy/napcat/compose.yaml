@@ -1,0 +1,27 @@
+name: napcat-banshi
+services:
+  napcat:
+    image: ${NAPCAT_IMAGE:-mlikiowa/napcat-docker:latest}
+    hostname: banshi-qq
+    environment:
+      NAPCAT_UID: '1000'
+      NAPCAT_GID: '1000'
+    ports: ['127.0.0.1:6099:6099']
+    volumes:
+      - ./config:/app/napcat/config
+      - qq-session:/app/.config/QQ
+      - napcat-cache:/app/napcat/cache
+      - napcat-logs:/app/napcat/logs
+    networks: [napcat]
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: { max-size: '10m', max-file: '3' }
+volumes:
+  qq-session:
+  napcat-cache:
+  napcat-logs:
+networks:
+  napcat:
+    external: true
+    name: banshi-napcat
