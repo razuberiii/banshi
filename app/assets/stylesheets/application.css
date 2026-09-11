@@ -10,3 +10,22 @@
 .forward-segments{min-width:0;flex:1}.forward-segments>p{white-space:pre-wrap;overflow-wrap:anywhere}.forward-segments>img{display:block;margin:12px 0}.nested-forward{padding:12px;margin-top:12px;border-left:2px solid var(--line);background:var(--soft)}.nested-forward .forward-node{gap:10px}.nested-forward .forward-avatar{font-size:10px;min-width:28px}
 
 .brand-icon{height:25px;width:25px;margin-left:4px;vertical-align:-3px;color:var(--ink)}
+
+/* Banshi: the archive is a window onto the network. */
+:root{--paper:#fafaf8;--ink:#202321;--muted:#727772;--line:#dfe2dc;--soft:#f1f3ef;--red:#4d6754}
+body{background:var(--paper);color:var(--ink)}
+.brand-word{font-family:Arial,sans-serif;font-size:34px;font-weight:700;letter-spacing:-1.8px;line-height:1}
+.brand-word small{font-size:9px;letter-spacing:1.4px;font-weight:400;text-transform:uppercase;margin-top:9px}
+.site-header{background:var(--paper)}
+.network-opening{padding:68px 0 48px;border-bottom:1px solid var(--line)}
+.eyebrow{font-family:monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 20px}
+.network-opening>.eyebrow{display:flex;justify-content:space-between}
+.network-opening h1{font-size:clamp(44px,6.3vw,80px);line-height:1.22;font-weight:500;letter-spacing:-.05em;margin:32px 0}
+.network-opening h1 span{color:var(--muted)}
+.network-intro{display:flex;justify-content:space-between;align-items:flex-end;gap:24px}
+.network-intro p{font-size:14px;line-height:1.9;color:var(--muted);margin:0}
+.museum-strip{background:transparent;border-bottom:1px solid var(--line);padding:24px 0;font-size:11px}
+.section{margin-top:64px}.section-heading .eyebrow{margin-bottom:12px}.section-heading h2{font-weight:500;letter-spacing:-.03em}
+.system-status{display:grid;grid-template-columns:minmax(140px,1fr) 2fr;max-width:760px;margin:40px 0 90px}
+.system-status dt,.system-status dd{padding:18px 0;border-bottom:1px solid var(--line);margin:0;overflow-wrap:anywhere}.system-status dd{font-family:monospace}
+@media(max-width:700px){.network-opening{padding:38px 0 30px}.network-opening>.eyebrow{font-size:10px}.network-opening>.eyebrow span{display:none}.network-intro{align-items:flex-start;flex-direction:column;gap:20px}.network-intro p{font-size:12px}.network-opening h1{margin:27px 0}.section{margin-top:42px}.museum-strip{gap:14px;flex-wrap:wrap}.primary-nav{overflow-x:auto;white-space:nowrap}.brand-word{font-size:29px}.system-status{grid-template-columns:1fr 1.4fr;font-size:12px}}
