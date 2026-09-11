@@ -19,7 +19,7 @@ module Banshi
     config.active_job.queue_adapter = :good_job
     config.autoload_lib(ignore: %w[assets tasks])
     config.secret_key_base = AppConfig.system.secret_key_base
-    config.hosts = AppConfig.system.allowed_hosts unless AppConfig.system.allowed_hosts.empty?
+    config.hosts = AppConfig.system.allowed_hosts.dup unless AppConfig.system.allowed_hosts.empty?
     config.generators.system_tests = nil
     config.action_dispatch.rescue_responses['AppConfig::Invalid'] = :unprocessable_entity
     config.filter_parameters += %i[password password_confirmation token access_token external_id payload email]

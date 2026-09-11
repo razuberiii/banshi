@@ -4,6 +4,7 @@ Rails.application.configure do
   config.consider_all_requests_local = false
   config.force_ssl = AppConfig.system.force_ssl
   config.assume_ssl = AppConfig.system.force_ssl
+  $stdout.sync = true
   config.logger = ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout))
   config.log_level = :info
   config.active_support.report_deprecations = false
