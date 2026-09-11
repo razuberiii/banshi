@@ -8,7 +8,14 @@ class GroupStatsRefresh
       good = reactions.where(reaction: AppConfig.trial.reaction_good).distinct.count(:transporter_id)
       funny = reactions.where(reaction: AppConfig.trial.reaction_funny).distinct.count(:transporter_id)
       bad = reactions.where(reaction: AppConfig.trial.reaction_bad).distinct.count(:transporter_id)
+      bot_interactions = Interaction.where(group: group, active: true, message_id: group.deliveries.where(status: 'sent').select(:message_id))
+      response = {
+        positive: bot_interactions.where(kind: 'reaction', reaction: [AppConfig.trial.reaction_good, AppConfig.trial.reaction_funny]).distinct.count(:transporter_id),
+        negative: bot_interactions.where(kind: 'reaction', reaction: AppConfig.trial.reaction_bad).distinct.count(:transporter_id),
+        replies: bot_interactions.where(kind: %w[reply quote]).distinct.count(:transporter_id)
+      }
       group.update!(stats: {
+        distribution_response: response,
         discoveries: group.discovered_entries.unmerged.count,
         classic_discoveries: group.discovered_entries.unmerged.where(level: 'CLASSIC').count,
         natural_occurrences: natural.count, natural_entries: natural.distinct.count(:shit_entry_id),

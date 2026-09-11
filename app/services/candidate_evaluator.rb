@@ -26,14 +26,18 @@ class CandidateEvaluator
         entry = ShitEntry.create!(content: candidate.content, first_group: candidate.group,
           first_transporter: candidate.transporter, first_seen_at: candidate.message.sent_at,
           last_natural_at: candidate.message.sent_at, safety_level: AppConfig.safety.default_level,
-          visibility: AppConfig.safety.default_visibility, level: 'ARCHIVED')
+          visibility: AppConfig.safety.default_visibility, level: AppConfig.trial.required_before_distribution ? 'ARCHIVED' : 'NORMAL')
         candidate.assign_attributes(status: 'accepted', shit_entry: entry, decision_reason: '观察期结束：独立参与者与规则得分达标')
         OccurrenceRecorder.call(entry: entry, message: candidate.message)
         TimelineEvent.create_or_find_by!(dedupe_key: "candidate:#{candidate.id}:accepted") do |event|
           event.assign_attributes(shit_entry: entry, group: candidate.group, transporter: candidate.transporter,
             event_type: 'collected', label: '候选正式入库', occurred_at: now, details: rules)
         end
-        TrialDispatchJob.perform_later(entry.id) if SafetyEvaluator.call(entry: entry).allowed?
+        if SafetyEvaluator.call(entry: entry).allowed?
+          TrialDispatchJob.perform_later(entry.id) if AppConfig.trial.enabled
+          DistributionJob.perform_later(entry.id) unless AppConfig.trial.required_before_distribution
+        end
+        DomainLog.emit('candidate.accepted', candidate_id: candidate.id, sid: entry.sid)
         changed = true
       else
         candidate.assign_attributes(status: 'expired', decision_reason: '观察期结束：独立参与者或规则得分不足')

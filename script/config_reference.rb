@@ -3,7 +3,7 @@
 require 'json'
 root=File.expand_path('..',__dir__)
 schema=JSON.parse(File.read(File.join(root,'config/app_config_schema.json')))
-env=["# 搬💩 v0.1 · 复制为 .env 后使用；所有键由 AppConfig 统一解析。",
+env=["# Banshi v0.1 · 复制为 .env 后使用；所有键由 AppConfig 统一解析。",
      "# 开发默认值。生产环境必须关闭 DEMO_ENABLED / SEED_DEMO 并更换密钥。",'']
 doc=["# 统一配置参考",'',
      '配置优先级：代码默认值 → ENV → 群数据库偏好。群偏好只覆盖胃口、摄入量、冷却等群设置，不能突破 RED 或平台硬标签。','',

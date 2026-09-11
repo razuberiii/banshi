@@ -12,6 +12,7 @@ class Collector
         content: message.content, expires_at: message.sent_at + AppConfig.candidate.ttl,
         reputation_snapshot: message.transporter&.reputation_score || 0.5)
     end
+    DomainLog.emit('candidate.created', candidate_id: candidate.id) if created
     CandidateEvaluator.call(candidate: candidate)
     CandidateExpireJob.set(wait_until: candidate.expires_at).perform_later(candidate.id) if candidate.pending?
     ReputationRefreshJob.perform_later(candidate.transporter_id) if created && candidate.pending? && candidate.transporter_id

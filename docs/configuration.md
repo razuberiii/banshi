@@ -33,15 +33,15 @@
 
 | ENV | AppConfig | 类型 / 输入单位 | 默认值 |
 | --- | --- | --- | --- |
-| `CANDIDATE_TTL_MINUTES` | `candidate.ttl` | minutes | 30 |
+| `CANDIDATE_TTL_MINUTES` | `candidate.ttl` | minutes | 5 |
 | `CANDIDATE_REPLY_WEIGHT` | `candidate.reply_weight` | float | 2 |
 | `CANDIDATE_QUOTE_WEIGHT` | `candidate.quote_weight` | float | 2.5 |
 | `CANDIDATE_REACTION_WEIGHT` | `candidate.reaction_weight` | float | 1.5 |
 | `CANDIDATE_REPEAT_WEIGHT` | `candidate.repeat_weight` | float | 5 |
 | `CANDIDATE_FORWARD_BASE_SCORE` | `candidate.forward_base` | float | 1 |
 | `CANDIDATE_IMAGE_BASE_SCORE` | `candidate.image_base` | float | 0 |
-| `CANDIDATE_MIN_SCORE` | `candidate.min_score` | float | 5 |
-| `CANDIDATE_MIN_UNIQUE_USERS` | `candidate.min_unique_users` | integer | 2 |
+| `CANDIDATE_MIN_SCORE` | `candidate.min_score` | float | 1.5 |
+| `CANDIDATE_MIN_UNIQUE_USERS` | `candidate.min_unique_users` | integer | 1 |
 | `CANDIDATE_ACTIVITY_WEIGHT` | `candidate.activity_weight` | float | 0 |
 | `CANDIDATE_MAX_LATE_MINUTES` | `candidate.max_late_age` | minutes | 1440 |
 
@@ -70,8 +70,8 @@
 
 | ENV | AppConfig | 类型 / 输入单位 | 默认值 |
 | --- | --- | --- | --- |
-| `SAFETY_DEFAULT_LEVEL` | `safety.default_level` | string | RED |
-| `SAFETY_DEFAULT_VISIBILITY` | `safety.default_visibility` | string | hidden |
+| `SAFETY_DEFAULT_LEVEL` | `safety.default_level` | string | GREEN |
+| `SAFETY_DEFAULT_VISIBILITY` | `safety.default_visibility` | string | public |
 | `SAFETY_TAGS` | `safety.tags` | list | ["GORE","NSFW","GROTESQUE","HARASSMENT","PRIVACY","EXTREME","OTHER_SENSITIVE"] |
 | `SAFETY_HARD_BLOCK_TAGS` | `safety.hard_block_tags` | list | ["PRIVACY","EXTREME"] |
 | `SAFETY_FILE_BLACKLIST` | `safety.file_blacklist` | list | [] |
@@ -98,6 +98,7 @@
 | `TRIAL_FUNNY_WEIGHT` | `trial.funny_weight` | float | 1 |
 | `TRIAL_BAD_WEIGHT` | `trial.bad_weight` | float | 2 |
 | `TRIAL_MAX_WAIT_HOURS` | `trial.max_wait` | hours | 24 |
+| `TRIAL_REQUIRED_BEFORE_DISTRIBUTION` | `trial.required_before_distribution` | boolean | false |
 
 ## distribution
 
@@ -112,6 +113,8 @@
 | `HOT_SCORE_THRESHOLD` | `distribution.hot_score_threshold` | float | 18 |
 | `HOT_MIN_NATURAL_OCCURRENCES` | `distribution.hot_min_natural` | integer | 5 |
 | `HOT_WINDOW_DAYS` | `distribution.hot_window` | days | 7 |
+| `DISTRIBUTION_NEXT_ROUND_MINUTES` | `distribution.next_round` | minutes | 15 |
+| `DISTRIBUTION_MIN_FEEDBACK` | `distribution.min_feedback` | integer | 1 |
 
 ## classic
 
@@ -158,6 +161,8 @@
 | `NAPCAT_MAX_FORWARD_MEDIA` | `napcat.max_forward_media` | integer | 50 |
 | `NAPCAT_MAX_MEDIA_PIXELS` | `napcat.max_media_pixels` | integer | 40000000 |
 | `NAPCAT_CONNECTION_TOKENS` | `napcat.connection_tokens` | json | {} |
+| `NAPCAT_CONNECTIONS` | `napcat.connections` | json | {} |
+| `NAPCAT_SYNC_SECONDS` | `napcat.sync_interval` | integer | 60 |
 
 ## storage
 

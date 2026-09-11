@@ -70,7 +70,8 @@ class SafetyEvaluator
       record
     end
     if call(entry: entry).allowed? && entry.candidates.where(status: 'accepted').exists? && !entry.trial_runs.where(status: 'finished').exists?
-      TrialDispatchJob.perform_later(entry.id)
+      TrialDispatchJob.perform_later(entry.id) if AppConfig.trial.enabled
+      DistributionJob.perform_later(entry.id) unless AppConfig.trial.required_before_distribution
     end
     decision
   end

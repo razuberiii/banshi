@@ -19,6 +19,8 @@ class OccurrenceRecorder
           label: source == 'NATURAL' ? '自然出现' : { 'BOT_TRIAL' => '机器人试吃', 'BOT_DISTRIBUTION' => '机器人传播', 'BOT_CLASSIC' => '经典考古' }.fetch(source),
           occurred_at: message.sent_at, details: { source: source, occurrence_id: created.id, duplicate_matched: duplicate_matched })
       end
+      DomainLog.emit('natural_occurrence.detected', sid: entry.sid, group_id: message.group_id) if source == 'NATURAL'
+      DomainLog.emit('duplicate.detected', sid: entry.sid, message_id: message.id) if duplicate_matched
       EntryStatsRefresh.call(entry)
       created
     end

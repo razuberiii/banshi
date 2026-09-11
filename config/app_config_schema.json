@@ -72,7 +72,7 @@
     "ttl": [
       "CANDIDATE_TTL_MINUTES",
       "minutes",
-      30
+      5
     ],
     "reply_weight": [
       "CANDIDATE_REPLY_WEIGHT",
@@ -107,12 +107,12 @@
     "min_score": [
       "CANDIDATE_MIN_SCORE",
       "float",
-      5
+      1.5
     ],
     "min_unique_users": [
       "CANDIDATE_MIN_UNIQUE_USERS",
       "integer",
-      2
+      1
     ],
     "activity_weight": [
       "CANDIDATE_ACTIVITY_WEIGHT",
@@ -188,12 +188,12 @@
     "default_level": [
       "SAFETY_DEFAULT_LEVEL",
       "string",
-      "RED"
+      "GREEN"
     ],
     "default_visibility": [
       "SAFETY_DEFAULT_VISIBILITY",
       "string",
-      "hidden"
+      "public"
     ],
     "tags": [
       "SAFETY_TAGS",
@@ -315,6 +315,11 @@
       "TRIAL_MAX_WAIT_HOURS",
       "hours",
       24
+    ],
+    "required_before_distribution": [
+      "TRIAL_REQUIRED_BEFORE_DISTRIBUTION",
+      "boolean",
+      false
     ]
   },
   "distribution": {
@@ -362,6 +367,16 @@
       "HOT_WINDOW_DAYS",
       "days",
       7
+    ],
+    "next_round": [
+      "DISTRIBUTION_NEXT_ROUND_MINUTES",
+      "minutes",
+      15
+    ],
+    "min_feedback": [
+      "DISTRIBUTION_MIN_FEEDBACK",
+      "integer",
+      1
     ]
   },
   "classic": {
@@ -508,6 +523,16 @@
       "NAPCAT_CONNECTION_TOKENS",
       "json",
       {}
+    ],
+    "connections": [
+      "NAPCAT_CONNECTIONS",
+      "json",
+      {}
+    ],
+    "sync_interval": [
+      "NAPCAT_SYNC_SECONDS",
+      "integer",
+      60
     ]
   },
   "storage": {

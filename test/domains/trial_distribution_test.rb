@@ -1,6 +1,10 @@
 require_relative '../domain_helpers'
 
 class TrialDistributionDomainTest < ActiveSupport::TestCase
+  def run
+    AppConfig.with(trial: { required_before_distribution: true }) { super }
+  end
+
   include DomainHelpers
   include ActiveJob::TestHelper
 

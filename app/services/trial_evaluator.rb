@@ -55,7 +55,7 @@ class TrialEvaluator
         unique_interaction_users: interaction_users, positive_rate: positive_rate, negative_rate: negative_rate,
         responsive_group_rate: responsive_rate, distribution_score: score, verdict: verdict, explanation: explanation)
       run.update!(status: 'finished', finished_at: now, explanation: run.explanation.merge('reason' => explanation.fetch('reason')))
-      entry.update!(level: passed ? 'NORMAL' : 'ARCHIVED', distribution_score: score)
+      entry.update!(level: AppConfig.trial.required_before_distribution ? (passed ? 'NORMAL' : 'ARCHIVED') : entry.level, distribution_score: score)
       TimelineEvent.create_or_find_by!(dedupe_key: "trial:#{run.id}:finished") do |event|
         event.assign_attributes(shit_entry: entry, event_type: 'trial_finished', label: passed ? '试吃通过' : responsive.zero? ? '试吃无响应，保留档案' : '试吃未通过，保留档案',
           occurred_at: now, details: { trial_run_id: run.id, verdict: verdict, positive_rate: positive_rate, negative_rate: negative_rate, responsive_group_rate: responsive_rate })

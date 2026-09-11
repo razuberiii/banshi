@@ -33,7 +33,7 @@ class Group < ApplicationRecord
   def effective_daily_limit = daily_limit || AppConfig.distribution.daily_limit
   def cooldown = cooldown_minutes.nil? ? AppConfig.distribution.cooldown : cooldown_minutes.minutes
   def available_connection
-    BotConnection.joins(bot_account: :group_bot_memberships).where(group_bot_memberships: { group_id: id, active: true }, bot_accounts: { active: true }, status: 'online').order(:id).first
+    BotConnection.joins(bot_account: :group_bot_memberships).where(group_bot_memberships: { group_id: id, active: true }, bot_accounts: { active: true }, status: 'online').where("bot_connections.adapter != 'real' OR bot_connections.last_seen_at > ?", (AppConfig.napcat.sync_interval * 3).seconds.ago).order(:id).first
   end
   def public_archive? = visibility == 'public' && AppConfig.features.public_groups
 end

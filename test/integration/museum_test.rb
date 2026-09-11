@@ -86,7 +86,7 @@ class MuseumTest < ActionDispatch::IntegrationTest
     assert_redirected_to group_path(@group)
     assert_equal 2,@group.reload.daily_limit
     assert_equal ['NSFW'],@group.accepted_tags
-    assert_equal 'RED',AppConfig.safety.default_level
+    assert_equal 'GREEN',AppConfig.safety.default_level
   end
 
   test 'a claimed manager controls collection and delivery without a card mode selector' do

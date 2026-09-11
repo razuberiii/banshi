@@ -8,14 +8,21 @@ class Distributor
     deliveries = with_reservation_lock do
       entry.lock!
       next [] unless SafetyEvaluator.call(entry: entry).allowed?
+      next [] if entry.deliveries.where(status: %w[pending sending uncertain]).where.not(kind: 'BOT_TRIAL').exists?
+      feedback = DistributionFeedback.call(entry: entry)
+      if feedback[:last_sent_at]
+        next [] if now < feedback[:last_sent_at] + AppConfig.distribution.next_round
+        next [] if feedback[:state] == 'negative' || feedback[:signals] < AppConfig.distribution.min_feedback
+      end
       selected = []
-      Group.order(Arel.sql('last_delivery_at ASC NULLS FIRST'), :id).each do |group|
+      Group.all.sort_by { |group| [-GroupMatcher.score(group), group.last_delivery_at || Time.at(0), group.id] }.each do |group|
         delivery = reserve!(entry: entry, group: group, kind: kind, now: now)
         selected << delivery if delivery
         break if selected.length >= AppConfig.distribution.batch_size
       end
       selected
     end
+    DomainLog.emit('distribution.planned', sid: entry.sid, delivery_ids: deliveries.map(&:id)) if deliveries.any?
     deliveries.each { |delivery| DeliveryJob.perform_later(delivery.id) }
     deliveries
   end
@@ -40,7 +47,7 @@ class Distributor
       delivery = existing || Delivery.new(idempotency_key: key)
       delivery.assign_attributes(shit_entry: entry, group: group, bot_connection: match.connection, trial_run: trial_run,
         kind: kind, status: 'pending', error_message: nil,
-        decision: { 'reserved_at' => now.iso8601(6), 'reasons' => [], 'daily_limit' => group.effective_daily_limit,
+        decision: { 'reserved_at' => now.iso8601(6), 'reasons' => [], 'match_score' => GroupMatcher.score(group), 'match_basis' => 'smoothed historical bot interaction rate and explicit reactions', 'daily_limit' => group.effective_daily_limit,
           'cooldown_seconds' => group.cooldown, 'global_per_minute' => AppConfig.distribution.global_per_minute })
       delivery.save!
       delivery
@@ -93,6 +100,7 @@ class Distributor
       # failed. That failure must also be reconciled, not resent.
       delivery.reload.update!(status: external_id.present? ? 'uncertain' : 'failed',
         external_message_id: external_id.presence || delivery.external_message_id, error_message: error.message.to_s.first(1000))
+      DomainLog.emit('delivery.failed', delivery_id: delivery.id, error_class: error.class.name)
       DomainLog.error(error, context: 'delivery', delivery_id: delivery.id, external_message_id: external_id)
       raise
     end
@@ -129,7 +137,9 @@ class Distributor
         end
       end
     end
+    DomainLog.emit('delivery.sent', delivery_id: delivery.id, sid: delivery.shit_entry.sid)
     GroupStatsRefreshJob.perform_later(delivery.group_id)
+    DistributionJob.set(wait: AppConfig.distribution.next_round).perform_later(delivery.shit_entry_id) unless delivery.kind == 'BOT_TRIAL'
   end
   private_class_method :complete_send!
 

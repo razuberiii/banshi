@@ -1,6 +1,10 @@
 require_relative '../domain_helpers'
 
 class CollectorDomainTest < ActiveSupport::TestCase
+  def run
+    AppConfig.with(candidate: { ttl: 1800, min_score: 5, min_unique_users: 2 }) { super }
+  end
+
   include DomainHelpers
   include ActiveJob::TestHelper
 
@@ -16,8 +20,8 @@ class CollectorDomainTest < ActiveSupport::TestCase
       assert_equal 'pending', candidate.reload.status
       CandidateEvaluator.call(candidate: candidate, now: message.sent_at + 1800)
       assert_equal 'accepted', candidate.reload.status
-      assert_equal 'RED', candidate.shit_entry.safety_level
-      assert_equal 'hidden', candidate.shit_entry.visibility
+      assert_equal 'GREEN', candidate.shit_entry.safety_level
+      assert_equal 'public', candidate.shit_entry.visibility
       assert_equal 1, candidate.shit_entry.natural_count
       assert_equal 2, candidate.rule_results['unique_users']
       assert_equal candidate.id, Collector.collect(message: message).id

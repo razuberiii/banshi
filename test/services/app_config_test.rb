@@ -6,7 +6,7 @@ class AppConfigTest < ActiveSupport::TestCase
     assert_equal false,c.features.phash
     assert_equal 0.25,c.reputation.natural_weight
     assert_equal %w[g1 g2],c.safety.source_blacklist
-    assert_equal 'RED',c.safety.default_level
+    assert_equal 'GREEN',c.safety.default_level
   end
   test 'invalid configuration fails before boot' do
     [{'CANDIDATE_TTL_MINUTES'=>'-1'},{'FEATURE_PHASH'=>'maybe'},{'TRIAL_GROUP_MIN'=>'6','TRIAL_GROUP_MAX'=>'3'},

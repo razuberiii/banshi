@@ -5,6 +5,15 @@ class GroupMatcher
     def allowed? = reasons.empty?
   end
 
+  # Unknown groups start at a neutral prior; silence is not a dislike.
+  def self.score(group)
+    stats = group.stats.fetch('distribution_response', {})
+    positive = stats.fetch('positive', 0).to_f
+    negative = stats.fetch('negative', 0).to_f
+    replies = stats.fetch('replies', 0).to_f
+    ((positive + replies + 1) / (positive + replies + negative + 2)).round(4)
+  end
+
   def self.call(entry:, group:, kind:, now: Time.current, excluding_delivery: nil)
     reasons = SafetyEvaluator.call(entry: entry, group: group).reasons.dup
     reasons << 'unsupported_delivery_kind' unless %w[BOT_TRIAL BOT_DISTRIBUTION BOT_CLASSIC].include?(kind)

@@ -1,6 +1,10 @@
 require_relative '../domain_helpers'
 
 class SimulationTest < ActiveSupport::TestCase
+  def run
+    AppConfig.with(candidate: { ttl: 1800, min_score: 5, min_unique_users: 2 }, safety: { default_level: 'RED', default_visibility: 'hidden' }, trial: { required_before_distribution: true }) { super }
+  end
+
   include DomainHelpers
   setup do
     @groups=10.times.map { domain_group(trial_preference:'OPT_IN') }
